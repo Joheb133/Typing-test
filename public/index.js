@@ -26,10 +26,11 @@ window.addEventListener('click', () => {
     });
 });
 class Enemy {
-    constructor(x, y) {
+    constructor(x, y, radian) {
         this.radius = innerWidth / 100;
         this.x = x;
         this.y = y;
+        this.radian = radian;
     }
     draw() {
         ctx.beginPath();
@@ -39,14 +40,14 @@ class Enemy {
     }
     ;
     resize() {
-        this.radius = innerWidth / 50;
+        this.radius = innerWidth / 100;
     }
 }
 class Player {
     constructor() {
         this.x = innerWidth / 2;
         this.y = innerHeight / 2;
-        this.radius = innerWidth / 4;
+        this.radius = innerWidth / 50;
         this.health = 500;
     }
     draw() {
@@ -67,9 +68,10 @@ function generateParticles(length) {
     const radius = 400;
     for (let i = 0; i < length; i++) {
         const radian = (Math.PI * 2) / length;
-        const x = (innerWidth / 2) + (Math.cos(radian * i) * getRndInteger(radius, radius + 400));
-        const y = (innerHeight / 2) + (Math.sin(radian * i) * getRndInteger(radius, radius + 400));
-        const enemy = new Enemy(x, y);
+        const offset = getRndInteger(1, 400);
+        const x = (innerWidth / 2) + (Math.cos(radian * i) * (radius + (offset)));
+        const y = (innerHeight / 2) + (Math.sin(radian * i) * (radius + (offset)));
+        const enemy = new Enemy(x, y, radian * i);
         enemyList.push(enemy);
     }
 }
@@ -80,6 +82,8 @@ function animate() {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
     enemyList.forEach(element => {
+        element.x -= Math.cos(element.radian) / 5;
+        element.y -= Math.sin(element.radian) / 5;
         element.draw();
     });
 }

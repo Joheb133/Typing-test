@@ -37,9 +37,11 @@ class Enemy {
     x: number;
     y: number;
     radius: number = innerWidth / 100;
-    constructor(x: number, y: number) {
+    radian: number;
+    constructor(x: number, y: number, radian: number) {
         this.x = x;
         this.y = y
+        this.radian = radian;
     }
 
     draw() {
@@ -50,7 +52,7 @@ class Enemy {
     };
 
     resize() {
-        this.radius = innerWidth / 50;
+        this.radius = innerWidth / 100;
     }
 
 }
@@ -59,7 +61,7 @@ class Enemy {
 class Player {
     x: number = innerWidth / 2;
     y: number = innerHeight / 2;
-    radius: number = innerWidth / 4;
+    radius: number = innerWidth / 50;
     health: number = 500;
 
     draw() {
@@ -83,10 +85,14 @@ let enemyList: Enemy[] = [];
 function generateParticles(length: number) {
     const radius = 400;
     for(let i = 0; i < length; i++){
-        const radian = (Math.PI * 2) / length;
-        const x = (innerWidth / 2) + (Math.cos(radian * i) * getRndInteger(radius, radius + 400));
-        const y = (innerHeight / 2) + (Math.sin(radian * i) * getRndInteger(radius, radius + 400));
-        const enemy = new Enemy(x, y);
+        const radian = (Math.PI * 2) / length; // divide circle by length amount
+        const offset = getRndInteger(1, 400)
+        // (radian * i) allows access to each incision of the circle. This is like saying radian * 1 ... radian * 2 etc.
+        // because the circle(Math.PI * 2) is divided by length, we can access each division by multiplying radian by a number
+        // in this case Max number would be length, at which the loop ends
+        const x = (innerWidth / 2) + (Math.cos(radian * i) * (radius + (offset))); // cos(radian * i) set xPos //cos is used to access x-axis // multiply by radius because cos and sin gives numbers from 0-1. This gives the radius circles will spawn around + offset
+        const y = (innerHeight / 2) + (Math.sin(radian * i) * (radius + (offset))); // sin(radian * i) set yPos //sin is used access y-axiss
+        const enemy = new Enemy(x, y, radian*i);
         enemyList.push(enemy);
     }
 }
@@ -101,6 +107,8 @@ function animate() {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
     enemyList.forEach(element => {
+        element.x -= Math.cos(element.radian) / 5
+        element.y -= Math.sin(element.radian) / 5
         element.draw();
     });
 }
