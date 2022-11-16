@@ -2,3 +2,4 @@ node_modules
 .vscode
 # Ignores compiled TypeScript files
 **/public/**/*.map
+utils

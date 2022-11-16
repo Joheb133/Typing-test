@@ -1,6 +1,8 @@
-"use strict";
+import Enemy from "./assets/enemy.js";
+import Player from "./assets/player.js";
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+export { ctx };
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 window.addEventListener('resize', () => {
@@ -11,6 +13,9 @@ window.addEventListener('resize', () => {
         element.resize();
     });
 });
+window.addEventListener('click', () => {
+    clearInterval(timerParticle);
+});
 function distance(x1, y1, x2, y2) {
     let xDistance = x2 - x1;
     let yDistance = y2 - y1;
@@ -19,64 +24,21 @@ function distance(x1, y1, x2, y2) {
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-window.addEventListener('click', () => {
-    enemyList.forEach(element => {
-        element.x = getRndInteger(innerWidth / 2, innerWidth);
-        element.y = getRndInteger(innerHeight / 2, innerHeight);
-    });
-});
-class Enemy {
-    constructor(x, y, radian) {
-        this.radius = innerWidth / 100;
-        this.x = x;
-        this.y = y;
-        this.radian = radian;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fill();
-    }
-    ;
-    resize() {
-        this.radius = innerWidth / 100;
-    }
-}
-class Player {
-    constructor() {
-        this.x = innerWidth / 2;
-        this.y = innerHeight / 2;
-        this.radius = innerWidth / 50;
-        this.health = 500;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = '#9BD8AA';
-        ctx.fill();
-    }
-    resize() {
-        this.x = innerWidth / 2;
-        this.y = innerHeight / 2;
-        this.radius = innerWidth / 50;
-    }
-}
 const player = new Player();
 let enemyList = [];
 function generateParticles(length) {
     const radius = 400;
     for (let i = 0; i < length; i++) {
-        const radian = (Math.PI * 2) / length;
+        const radian = (Math.PI * 2) / 90;
         const offset = getRndInteger(1, 400);
-        const x = (innerWidth / 2) + (Math.cos(radian * i) * (radius + (offset)));
-        const y = (innerHeight / 2) + (Math.sin(radian * i) * (radius + (offset)));
-        const enemy = new Enemy(x, y, radian * i);
+        const x = (innerWidth / 2) + (Math.cos(radian * offset) * (radius + (offset)));
+        const y = (innerHeight / 2) + (Math.sin(radian * offset) * (radius + (offset)));
+        const enemy = new Enemy(x, y, radian * offset);
         enemyList.push(enemy);
     }
 }
-generateParticles(50);
-console.log(enemyList);
+const timerParticle = setInterval(function () { generateParticles(1); }, 1000);
+generateParticles(5);
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
