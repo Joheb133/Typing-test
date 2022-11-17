@@ -23,6 +23,7 @@ function distance(x1, y1, x2, y2) {
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+const dictionary = ['bob', 'trunk', 'part', 'produce', 'name', 'observation', 'offender', 'calf', 'ferry', 'coffin', 'agreement', 'regular', 'smart', 'harm', 'final'];
 const player = new Player();
 let enemyList = [];
 function generateParticles(length) {
@@ -30,15 +31,15 @@ function generateParticles(length) {
     for (let i = 0; i < length; i++) {
         const radian = (Math.PI * 2) / 90;
         const offset = getRndInteger(1, 400);
+        const word = dictionary[getRndInteger(0, dictionary.length - 1)];
         const x = (innerWidth / 2) + (Math.cos(radian * offset) * (radius + (offset)));
         const y = (innerHeight / 2) + (Math.sin(radian * offset) * (radius + (offset)));
-        const enemy = new Enemy(x, y, radian * offset);
+        const enemy = new Enemy(x, y, radian * offset, word);
         enemyList.push(enemy);
     }
 }
-const timerParticle = setInterval(function () { generateParticles(1); }, 2000);
+generateParticles(50);
 function animate() {
-    requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
     enemyList.forEach((element, index) => {
