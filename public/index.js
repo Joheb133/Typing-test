@@ -42,7 +42,12 @@ function updateEnemy() {
 }
 createEnemy(2);
 const player = new Player();
-document.addEventListener('keypress', (e) => {
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Backspace') {
+        const playerLength = player.input.length;
+        player.input = player.input.slice(0, playerLength - 1);
+        return;
+    }
     if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123)) {
         player.input += e.key;
     }
@@ -50,7 +55,6 @@ document.addEventListener('keypress', (e) => {
     if (e.code === 'Space') {
         enemyList.forEach((element, index) => {
             if (player.input === element.word) {
-                console.log(true);
                 enemyList.splice(index, 1);
             }
             else {
