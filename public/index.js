@@ -43,6 +43,8 @@ function updateEnemy() {
 createEnemy(2);
 const player = new Player();
 document.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter')
+        return;
     if (e.code === 'Backspace') {
         const playerLength = player.input.length;
         player.input = player.input.slice(0, playerLength - 1);
@@ -51,7 +53,6 @@ document.addEventListener('keydown', (e) => {
     if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123)) {
         player.input += e.key;
     }
-    ;
     if (e.code === 'Space') {
         enemyList.forEach((element, index) => {
             if (player.input === element.word) {
