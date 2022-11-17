@@ -21,7 +21,7 @@ function createEnemy(length) {
     const radius = 400;
     for (let i = 0; i < length; i++) {
         const radian = (Math.PI * 2) / 80;
-        const offset = getRndInteger(1, 400);
+        const offset = getRndInteger(1, 200);
         const word = dictionary[getRndInteger(0, dictionary.length - 1)];
         const x = (innerWidth / 2) + (Math.cos(radian * offset) * (radius + (offset)));
         const y = (innerHeight / 2) + (Math.sin(radian * offset) * (radius + (offset)));
@@ -31,8 +31,8 @@ function createEnemy(length) {
 }
 function updateEnemy() {
     enemyList.forEach((element, index) => {
-        element.x -= Math.cos(element.radian) / 2;
-        element.y -= Math.sin(element.radian) / 2;
+        element.x -= Math.cos(element.radian) / 5;
+        element.y -= Math.sin(element.radian) / 5;
         if (distance(element.x, element.y, player.x, player.y) - (element.radius + player.radius) < 0) {
             enemyList.splice(index, 1);
             player.health--;
@@ -40,7 +40,7 @@ function updateEnemy() {
         element.draw();
     });
 }
-createEnemy(2);
+createEnemy(5);
 const player = new Player();
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Enter')
@@ -50,27 +50,34 @@ document.addEventListener('keydown', (e) => {
         player.input = player.input.slice(0, playerLength - 1);
         return;
     }
+    ;
     if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123)) {
         player.input += e.key;
     }
+    ;
     if (e.code === 'Space') {
+        let splicedEnemy = false;
         enemyList.forEach((element, index) => {
-            if (player.input === element.word) {
+            if (player.input === element.word && !splicedEnemy) {
                 enemyList.splice(index, 1);
+                splicedEnemy = true;
             }
-            else {
-                player.color = '#ff3d3d';
-                const timer = setTimeout(() => {
-                    player.color = '#9BD8AA';
-                    clearTimeout(timer);
-                }, 1000);
-            }
-            ;
         });
+        if (!splicedEnemy) {
+            splicedEnemy = false;
+            player.color = '#ff3d3d';
+            const timer = setTimeout(() => {
+                player.color = '#9BD8AA';
+                clearTimeout(timer);
+            }, 1000);
+        }
         player.input = '';
     }
     ;
 });
+const gameTimer = setInterval(() => {
+    createEnemy(1);
+}, 2000);
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
