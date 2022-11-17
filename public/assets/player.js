@@ -5,11 +5,13 @@ export default class Player {
         this.y = innerHeight / 2;
         this.radius = innerWidth / 50;
         this.health = 200;
+        this.input = '';
+        this.color = '#9BD8AA';
     }
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = '#9BD8AA';
+        ctx.fillStyle = this.color;
         ctx.fill();
         ctx.beginPath();
         ctx.rect(0, 0, 200, 20);
@@ -19,6 +21,10 @@ export default class Player {
         ctx.rect(0, 0, this.health, 20);
         ctx.fillStyle = '#9BD8AA';
         ctx.fill();
+        ctx.font = '16px Arial';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.input, this.x, this.y + this.radius + 16);
     }
     resize() {
         this.x = innerWidth / 2;

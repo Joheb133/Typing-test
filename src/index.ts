@@ -1,5 +1,7 @@
 import Enemy from "./assets/enemy.js";
 import Player from "./assets/player.js";
+import getRndInteger from "./utils/rng.js";
+import distance from "./utils/distance.js";
 const canvas = document.querySelector('canvas')!;
 const ctx = canvas.getContext('2d')!;
 
@@ -16,31 +18,13 @@ window.addEventListener('resize', () => {
     })
 })
 
-window.addEventListener('click', () => {
-    //clearInterval(timerParticle)
-});
-
-
-//distance function
-function distance(x1: number, y1: number, x2: number, y2: number) {
-    let xDistance = x2 - x1;
-    let yDistance = y2 - y1;
-
-    return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-}
-//random function
-function getRndInteger(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1) ) + min;
-}
-
 //Create player & enemy
 const dictionary: string[] = ['bob','trunk','part','produce','name','observation','offender','calf','ferry','coffin','agreement','regular','smart','harm','final'];
-const player = new Player();
 let enemyList: Enemy[] = []; 
-function generateParticles(length: number) {
+function createEnemy(length: number) {
     const radius = 400;
     for(let i = 0; i < length; i++){
-        const radian = (Math.PI * 2) / 90; // divide circle by fixed amount. There are problems when adding new enemies when using length
+        const radian = (Math.PI * 2) / 80; // divide circle by fixed amount. There are problems when adding new enemies when using length
         const offset = getRndInteger(1, 400);
         const word = dictionary[getRndInteger(0, dictionary.length - 1)];
         // (radian * i) allows access to each incision of the circle. This is like saying radian * 1 ... radian * 2 etc.
@@ -53,12 +37,8 @@ function generateParticles(length: number) {
     }
 }
 
-generateParticles(50)
-
-function animate() {
-    //requestAnimationFrame(animate);
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    player.draw();
+//enemy physics
+function updateEnemy () {
     enemyList.forEach((element, index) => {
         element.x -= Math.cos(element.radian) / 2
         element.y -= Math.sin(element.radian) / 2
@@ -69,6 +49,39 @@ function animate() {
         }
         element.draw();
     });
+}
+createEnemy(2)
+
+//player physics
+const player = new Player();
+document.addEventListener('keypress', (e) => {
+    if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123)){
+        player.input += e.key;
+    };
+    if (e.code === 'Space') {
+        enemyList.forEach((element, index) => {
+            if (player.input === element.word) {
+                console.log(true);
+                enemyList.splice(index, 1);
+            } else {
+                player.color = '#ff3d3d';
+                const timer = setTimeout(()=>{
+                    player.color = '#9BD8AA';
+                    clearTimeout(timer)
+                }, 1000)
+                
+            };
+        });
+        player.input = '';
+    };
+    
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    player.draw();
+    updateEnemy();
 }
 animate();
 
