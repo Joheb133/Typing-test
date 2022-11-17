@@ -14,7 +14,6 @@ window.addEventListener('resize', () => {
     });
 });
 window.addEventListener('click', () => {
-    clearInterval(timerParticle);
 });
 function distance(x1, y1, x2, y2) {
     let xDistance = x2 - x1;
@@ -37,15 +36,18 @@ function generateParticles(length) {
         enemyList.push(enemy);
     }
 }
-const timerParticle = setInterval(function () { generateParticles(1); }, 1000);
-generateParticles(5);
+const timerParticle = setInterval(function () { generateParticles(1); }, 2000);
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
-    enemyList.forEach(element => {
-        element.x -= Math.cos(element.radian) / 5;
-        element.y -= Math.sin(element.radian) / 5;
+    enemyList.forEach((element, index) => {
+        element.x -= Math.cos(element.radian) / 2;
+        element.y -= Math.sin(element.radian) / 2;
+        if (distance(element.x, element.y, player.x, player.y) - (element.radius + player.radius) < 0) {
+            enemyList.splice(index, 1);
+            player.health--;
+        }
         element.draw();
     });
 }

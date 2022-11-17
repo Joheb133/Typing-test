@@ -17,7 +17,7 @@ window.addEventListener('resize', () => {
 })
 
 window.addEventListener('click', () => {
-    clearInterval(timerParticle)
+    //clearInterval(timerParticle)
 });
 
 
@@ -34,14 +34,13 @@ function getRndInteger(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
+//Create player & enemy
 const player = new Player();
-
 let enemyList: Enemy[] = []; 
-
 function generateParticles(length: number) {
     const radius = 400;
     for(let i = 0; i < length; i++){
-        const radian = (Math.PI * 2) / 90; // divide circle by length amount
+        const radian = (Math.PI * 2) / 90; // divide circle by fixed amount. There are problems when adding new enemies when using length
         const offset = getRndInteger(1, 400)
         // (radian * i) allows access to each incision of the circle. This is like saying radian * 1 ... radian * 2 etc.
         // because the circle(Math.PI * 2) is divided by length, we can access each division by multiplying radian by a number
@@ -53,17 +52,21 @@ function generateParticles(length: number) {
     }
 }
 
-const timerParticle = setInterval(function () {generateParticles(1)}, 1000)
+const timerParticle = setInterval(function () {generateParticles(1)}, 2000)
 
-generateParticles(5)
 
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
-    enemyList.forEach(element => {
-        element.x -= Math.cos(element.radian) / 5
-        element.y -= Math.sin(element.radian) / 5
+    enemyList.forEach((element, index) => {
+        element.x -= Math.cos(element.radian) / 2
+        element.y -= Math.sin(element.radian) / 2
+        //collision
+        if(distance(element.x, element.y, player.x, player.y) - (element.radius + player.radius) < 0) {
+            enemyList.splice(index, 1) //destroy enemy on collision
+            player.health--;
+        }
         element.draw();
     });
 }
