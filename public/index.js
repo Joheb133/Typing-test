@@ -1,5 +1,6 @@
 import Enemy from "./assets/enemy.js";
 import Player from "./assets/player.js";
+import { dictionary } from "./assets/dictionary.js";
 import getRndInteger from "./utils/rng.js";
 import distance from "./utils/distance.js";
 const canvas = document.querySelector('canvas');
@@ -15,7 +16,6 @@ window.addEventListener('resize', () => {
         element.resize();
     });
 });
-const dictionary = ['bob', 'trunk', 'part', 'produce', 'name', 'observation', 'offender', 'calf', 'ferry', 'coffin', 'agreement', 'regular', 'smart', 'harm', 'final'];
 let enemyList = [];
 function createEnemy(length) {
     const radius = 400;
@@ -51,7 +51,7 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     ;
-    if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123)) {
+    if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
         player.input += e.key;
     }
     ;
@@ -75,14 +75,29 @@ document.addEventListener('keydown', (e) => {
     }
     ;
 });
-const gameTimer = setInterval(() => {
+let time = 4000;
+const Timer = function () {
     createEnemy(1);
-}, 2000);
+    setTimeout(Timer, time);
+    if (time < 500)
+        return;
+    if (time > 3000) {
+        time -= 50;
+    }
+    else {
+        time -= 10;
+    }
+};
+setTimeout(Timer, time);
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
     updateEnemy();
+    ctx.font = '16px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText(time.toString(), innerWidth / 2, 20);
 }
 animate();
 //# sourceMappingURL=index.js.map
