@@ -12,9 +12,7 @@ window.addEventListener('resize', () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
     player.resize();
-    enemyList.forEach(element => {
-        element.resize();
-    });
+    enemyResize();
 });
 let enemyList = [];
 function createEnemy(length) {
@@ -43,7 +41,22 @@ function updateEnemy() {
         element.drawText();
     });
 }
-createEnemy(5);
+createEnemy(20);
+const previousScreenSize = {
+    width: innerWidth / 2,
+    height: innerHeight / 2
+};
+function enemyResize() {
+    const differnceX = previousScreenSize.width - (innerWidth / 2);
+    const differnceY = previousScreenSize.height - (innerHeight / 2);
+    previousScreenSize.width = innerWidth / 2;
+    previousScreenSize.height = innerHeight / 2;
+    enemyList.forEach(element => {
+        element.resize();
+        element.x -= differnceX;
+        element.y -= differnceY;
+    });
+}
 let removedEnemies = 0;
 const player = new Player();
 document.addEventListener('keydown', (e) => {
@@ -61,13 +74,14 @@ document.addEventListener('keydown', (e) => {
     ;
     if (e.code === 'Space') {
         let splicedEnemy = false;
-        enemyList.forEach((element, index) => {
-            if (player.input === element.word && !splicedEnemy) {
+        for (const [index, element] of enemyList.entries()) {
+            if (player.input === element.word) {
                 enemyList.splice(index, 1);
                 splicedEnemy = true;
                 removedEnemies++;
+                break;
             }
-        });
+        }
         if (!splicedEnemy) {
             splicedEnemy = false;
             player.color = '#ff3d3d';

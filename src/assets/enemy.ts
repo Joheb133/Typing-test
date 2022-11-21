@@ -1,4 +1,3 @@
-import { createJsxText } from "../../node_modules/typescript/lib/typescript.js";
 import { ctx } from "../index.js";
 export default class Enemy {
     x: number;
@@ -29,11 +28,9 @@ export default class Enemy {
         ctx.fillStyle = '#FFFFFF'
         ctx.fill();
     }
-    
+
     resize() {
         this.radius = innerWidth / 100;
-        this.x = innerWidth / 2;
-        this.y = innerHeight / 2;
     }
 }
 

@@ -13,10 +13,9 @@ canvas.height = innerHeight;
 window.addEventListener('resize', () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
+
     player.resize();
-    enemyList.forEach(element => {
-        element.resize();
-    })
+    enemyResize();
 })
 
 /* ---enemy--- */
@@ -51,44 +50,65 @@ function updateEnemy() {
         }
         element.drawCircle()
     });
-    enemyList.forEach(element =>{
+    enemyList.forEach(element => {
         element.drawText()
     })
 }
-createEnemy(5)
+createEnemy(20)
+
+//enemy responsiveness
+const previousScreenSize = {
+    width: innerWidth / 2,
+    height: innerHeight / 2
+}
+function enemyResize() {
+    //find difference between previous screen size vs new screen size
+    const differnceX = previousScreenSize.width - (innerWidth / 2);
+    const differnceY = previousScreenSize.height - (innerHeight / 2);
+    //update screen size
+    previousScreenSize.width = innerWidth / 2;
+    previousScreenSize.height = innerHeight / 2;
+    enemyList.forEach(element => {
+        element.resize(); //change radius
+        //add offset(difference)
+        element.x -= differnceX;
+        element.y -= differnceY;
+    })
+}
 
 //player physics
 let removedEnemies: number = 0;
 const player = new Player();
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Enter') return;
-    if (e.code === 'Backspace') {
+    if (e.code === 'Backspace') { //remove 1 character from user input
         const playerLength = player.input.length;
         player.input = player.input.slice(0, playerLength - 1);
-        return;
+        return; //don't check other if statements
     };
     if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
-        player.input += e.key;
+        player.input += e.key; //add character input
     };
-    if (e.code === 'Space') {
+    if (e.code === 'Space') { //read input
         let splicedEnemy: boolean = false;
-        enemyList.forEach((element, index) => {
-            if (player.input === element.word && !splicedEnemy) {
+        for (const [index, element] of enemyList.entries()) {
+            if (player.input === element.word) { 
                 enemyList.splice(index, 1);
                 splicedEnemy = true;
                 //score
                 removedEnemies++;
+                break
             }
-        });
-        if (!splicedEnemy) {
+        }
+        if (!splicedEnemy) { //if user input = wrong AKA no enemies were spliced/destroyed
             splicedEnemy = false;
             player.color = '#ff3d3d';
-            const timer = setTimeout(() => {
+            const timer = setTimeout(() => { //red indicator
                 player.color = '#9BD8AA';
                 clearTimeout(timer);
             }, 1000)
         }
-        player.input = '';
+        player.input = ''; // reset input
     };
 });
 
@@ -99,17 +119,13 @@ const spawnTimer = function () {
     createEnemy(1)
     setTimeout(spawnTimer, time);
     if (time <= 500) return
-    
     if (time > 3000) {
         time -= 50;
     } else {
         time -= 25;
     }
-    
 }
 //setTimeout(spawnTimer, time)
-
-
 
 
 //animator

@@ -26,8 +26,6 @@ export default class Enemy {
     }
     resize() {
         this.radius = innerWidth / 100;
-        this.x = innerWidth / 2;
-        this.y = innerHeight / 2;
     }
 }
 //# sourceMappingURL=enemy.js.map
