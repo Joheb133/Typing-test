@@ -37,10 +37,14 @@ function updateEnemy() {
             enemyList.splice(index, 1);
             player.health--;
         }
-        element.draw();
+        element.drawCircle();
+    });
+    enemyList.forEach(element => {
+        element.drawText();
     });
 }
 createEnemy(5);
+let removedEnemies = 0;
 const player = new Player();
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Enter')
@@ -61,6 +65,7 @@ document.addEventListener('keydown', (e) => {
             if (player.input === element.word && !splicedEnemy) {
                 enemyList.splice(index, 1);
                 splicedEnemy = true;
+                removedEnemies++;
             }
         });
         if (!splicedEnemy) {
@@ -75,20 +80,19 @@ document.addEventListener('keydown', (e) => {
     }
     ;
 });
-let time = 4000;
-const Timer = function () {
+let time = 1000;
+const spawnTimer = function () {
     createEnemy(1);
-    setTimeout(Timer, time);
-    if (time < 500)
+    setTimeout(spawnTimer, time);
+    if (time <= 500)
         return;
     if (time > 3000) {
         time -= 50;
     }
     else {
-        time -= 10;
+        time -= 25;
     }
 };
-setTimeout(Timer, time);
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
@@ -98,6 +102,7 @@ function animate() {
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText(time.toString(), innerWidth / 2, 20);
+    ctx.fillText(removedEnemies.toString(), innerWidth / 2 + 100, 20);
 }
 animate();
 //# sourceMappingURL=index.js.map

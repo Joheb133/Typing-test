@@ -20,7 +20,6 @@ window.addEventListener('resize', () => {
 })
 
 /* ---enemy--- */
-
 let enemyList: Enemy[] = [];
 function createEnemy(length: number) {
     const radius = 400;
@@ -40,6 +39,8 @@ function createEnemy(length: number) {
 
 //enemy physics
 function updateEnemy() {
+    //seperate draw-text() & draw-circle() so text is always above circle
+    //*not sure how expensive that is but it solves the problem for now
     enemyList.forEach((element, index) => {
         element.x -= Math.cos(element.radian) / 5
         element.y -= Math.sin(element.radian) / 5
@@ -48,12 +49,16 @@ function updateEnemy() {
             enemyList.splice(index, 1) //destroy enemy on collision
             player.health--;
         }
-        element.draw();
+        element.drawCircle()
     });
+    enemyList.forEach(element =>{
+        element.drawText()
+    })
 }
 createEnemy(5)
 
 //player physics
+let removedEnemies: number = 0;
 const player = new Player();
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Enter') return;
@@ -71,6 +76,8 @@ document.addEventListener('keydown', (e) => {
             if (player.input === element.word && !splicedEnemy) {
                 enemyList.splice(index, 1);
                 splicedEnemy = true;
+                //score
+                removedEnemies++;
             }
         });
         if (!splicedEnemy) {
@@ -86,21 +93,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 //timer
-let time: number = 4000;
+let time: number = 1000;
 
-const Timer = function () {
+const spawnTimer = function () {
     createEnemy(1)
-    setTimeout(Timer, time);
-    if (time < 500) return
+    setTimeout(spawnTimer, time);
+    if (time <= 500) return
     
     if (time > 3000) {
         time -= 50;
     } else {
-        time -= 10;
+        time -= 25;
     }
     
 }
-setTimeout(Timer, time)
+//setTimeout(spawnTimer, time)
+
+
 
 
 //animator
@@ -109,10 +118,11 @@ function animate() {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     player.draw();
     updateEnemy();
-    //text
+    //stats
     ctx.font = '16px Arial';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center'
-    ctx.fillText(time.toString(), innerWidth / 2, 20)
+    ctx.fillText(time.toString(), innerWidth / 2, 20)//enemy spawn rate
+    ctx.fillText(removedEnemies.toString(), innerWidth / 2 + 100, 20)//enemies killed
 }
 animate();
