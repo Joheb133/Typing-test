@@ -1,15 +1,14 @@
-import Enemy from "./assets/enemy.js";
-import Player from "./assets/player.js";
-import { dictionary } from "./assets/dictionary.js";
-import getRndInteger from "./utils/rng.js";
-import distance from "./utils/distance.js";
-const canvas = document.querySelector('canvas')!;
-const ctx = canvas.getContext('2d')!;
+import Enemy from "./src/assets/enemy.js";
+import Player from "./src/assets/player.js";
+import { dictionary } from "./src/assets/dictionary.js";
+import getRndInteger from "./src/utils/rng.js";
+import distance from "./src/utils/distance.js";
+import * as THREE from 'three';
+/* const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d')!; */
 
-export { ctx }
-
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+//export { ctx }
+/* 
 window.addEventListener('resize', () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
@@ -18,7 +17,7 @@ window.addEventListener('resize', () => {
     enemyResize();
 })
 
-/* ---enemy--- */
+// ---enemy--- 
 let enemyList: Enemy[] = [];
 function createEnemy(length: number) {
     const radius = 400;
@@ -92,7 +91,7 @@ document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') { //read input
         let splicedEnemy: boolean = false;
         for (const [index, element] of enemyList.entries()) {
-            if (player.input === element.word) { 
+            if (player.input === element.word) { //if input = word run code then break out of loop. No need to check the whole loop if input = word
                 enemyList.splice(index, 1);
                 splicedEnemy = true;
                 //score
@@ -141,4 +140,28 @@ function animate() {
     ctx.fillText(time.toString(), innerWidth / 2, 20)//enemy spawn rate
     ctx.fillText(removedEnemies.toString(), innerWidth / 2 + 100, 20)//enemies killed
 }
-animate();
+*/
+//animate();
+
+//cube test
+let width: number = window.innerWidth;
+let height: number = window.innerHeight;
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-el') as HTMLCanvasElement });
+renderer.setSize(width, height)
+const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
+const scene = new THREE.Scene();
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0xffad00 });
+const cube = new THREE.Mesh(geometry, material);
+cube.position.z = -5;
+cube.position.y = 1;
+
+scene.add(cube)
+
+const light = new THREE.DirectionalLight(0xFFFFFF, 1)
+light.position.set(0, 4, 2)
+
+scene.add(light)
+
+renderer.render(scene, camera)

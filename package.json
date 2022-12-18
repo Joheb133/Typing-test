@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -16,9 +19,14 @@
     "url": "https://github.com/Joheb133/Typing-test/issues"
   },
   "homepage": "https://github.com/Joheb133/Typing-test#readme",
-  "dependencies": {},
+  "dependencies": {
+    "three": "^0.147.0"
+  },
   "devDependencies": {
-    "typescript": "^4.9.3",
-    "@types/node": "^18.11.9"
+    "@types/node": "^18.11.9",
+    "@types/three": "^0.146.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.2"
   }
 }
