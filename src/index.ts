@@ -3,6 +3,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
+import { Vector3 } from 'three';
 
 //setup
 let width: number = window.innerWidth;
@@ -19,7 +20,7 @@ scene.add(light)
 
 //player
 const enemy = new EnemyHandler(scene)
-const player = new Player(scene);
+const player = new Player(scene, enemy);
 
 //cube test
 // const geometry = new THREE.SphereGeometry(1, 16, 16)

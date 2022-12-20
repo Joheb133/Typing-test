@@ -14,8 +14,9 @@ export default class Player{
     scene: THREE.Scene;
     model: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
 
-    constructor(scene: THREE.Scene, /* enemy: EnemyHandler */) {
+    constructor(scene: THREE.Scene, enemy: EnemyHandler) {
         this.scene = scene;
+        this.enemy = enemy;
         //this.enemy = enemy;
         this.initialize();
     }
@@ -69,17 +70,23 @@ export default class Player{
         this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
     }
 
-/*     private collisionDetection() {
+    private collisionDetection() {
         //collision
         this.enemy.list.forEach((element, index) => {
-            if (distance(element.x, element.y, this.x, this.y) - (element.radius + this.radius) < 0) {
-                this.enemy.list.splice(index, 1) //destroy enemy on collision
+            if (distance(element.model.position.x, element.model.position.y, 0, 0) <= this.radius+element.radius) {
+                //destroy enemy on collision
+                this.scene.remove(element.model) //remove enemy model
+                element.model.geometry.dispose(); //clean memory
+                element.model.material.dispose();
+                this.enemy.list.splice(index, 1)  //remove enemy from enemy handlers list
+
                 this.health--;
+                console.log(this.scene.children)
             }
         });
-    }; */
+    };
 
     public update() {
-        //this.collisionDetection();
+        this.collisionDetection();
     }
 }
