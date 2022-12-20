@@ -1,50 +1,44 @@
-import EnemyHandler from './assets/EnemyHandler';
+import * as THREE from 'three';
+
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import Player from './assets/player';
-import { Context } from 'vm';
 
-const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d') as Context;
+//setup
+let width: number = window.innerWidth;
+let height: number = window.innerHeight;
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-el') as HTMLCanvasElement });
+renderer.setSize(width, height)
+const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
+camera.position.set(0, 0, 50)
+camera.lookAt(new THREE.Vector3(0, 0, 0))
+const scene = new THREE.Scene();
 
-const enemy = new EnemyHandler(ctx);
-const player = new Player(ctx, enemy);
+const light = new THREE.AmbientLight(0x404040, 1)
+scene.add(light)
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+//player
+const player = new Player(scene);
+
+//cube test
+// const geometry = new THREE.SphereGeometry(1, 16, 16)
+// const material = new THREE.MeshBasicMaterial({color: 0xff0000})
+// const cube = new THREE.Mesh(geometry, material)
+
+//resize renderer
 window.addEventListener('resize', () => {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
+    width = window.innerWidth;
+    height = window.innerHeight;
+    renderer.setSize(width, height)
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
     player.resize();
-    enemy.resize();
 })
 
-//timer
-/* let time: number = 1000;
-const spawnTimer = function () {
-    createEnemy(1)
-    setTimeout(spawnTimer, time);
-    if (time <= 500) return
-    if (time > 3000) {
-        time -= 50;
-    } else {
-        time -= 25;
-    }
-} */
-//setTimeout(spawnTimer, time)
-
-
 //animator
-function animate() {
-    requestAnimationFrame(animate);
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    player.update();
-    enemy.update();
-    //stats
-    ctx.font = '16px Arial';
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center'
-    //ctx.fillText(time.toString(), innerWidth / 2, 20)//enemy spawn rate
-    ctx.fillText(player.removedEnemies.toString(), innerWidth / 2 + 100, 20)//enemies killed
+function animator() {
+    player.update()
+    renderer.render(scene, camera);
+    requestAnimationFrame(animator)
 }
-
-animate();
+animator();

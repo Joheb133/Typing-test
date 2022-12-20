@@ -1,30 +1,37 @@
+import * as THREE from 'three';
 import EnemyHandler from "./EnemyHandler.js";
 import distance from "../utils/distance.js";
-import { Context } from "vm";
 
-export default class Player {
+export default class Player{
     x: number = innerWidth / 2;
     y: number = innerHeight / 2;
-    radius: number = innerWidth / 50;
+    radius: number = innerWidth / 500;
     health: number = 200;
     input: string = '';
     color: string = '#9BD8AA';
     removedEnemies: number = 0;
     enemy: EnemyHandler;
-    ctx: Context;
+    scene: THREE.Scene;
+    model: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
 
-    constructor(ctx: Context, enemy: EnemyHandler) {
-        this.ctx = ctx;
-        this.enemy = enemy;
+    constructor(scene: THREE.Scene, /* enemy: EnemyHandler */) {
+        this.scene = scene;
+        //this.enemy = enemy;
         this.initialize();
     }
 
-    public initialize() {
+    private async initialize() {
         //=>load model<=
-        document.addEventListener('keydown', (e) => this.updatePhysics(e))
+        const sphereGeometry = new THREE.SphereGeometry(this.radius, 16, 16);
+        const sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+        this.model = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        this.scene.add(this.model);
+
+        //Key inputs
+        //document.addEventListener('keydown', (e) => this.updatePhysics(e))
     }
 
-    private updatePhysics(e: KeyboardEvent) {
+/*     private updatePhysics(e: KeyboardEvent) {
         if (e.code === 'Enter') return;
         if (e.code === 'Backspace') { //remove 1 character from user input
             this.input = this.input.slice(0, this.input.length - 1);
@@ -54,39 +61,15 @@ export default class Player {
             }
             this.input = ''; // reset input
         };
-    }
-
-    private draw() {
-        const ctx = this.ctx;
-        //circle
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        //health
-        ctx.beginPath();
-        ctx.rect(0, 0, 200, 20);
-        ctx.fillStyle = '#ff3d3d';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.rect(0, 0, this.health, 20);
-        ctx.fillStyle = '#9BD8AA';
-        ctx.fill();
-        //text
-        ctx.font = '16px Arial';
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center'
-        ctx.fillText(this.input, this.x, this.y + this.radius + 16)
-    }
+    } */
 
     public resize() {
-        this.x = innerWidth / 2;
-        this.y = innerHeight / 2;
-        this.radius = innerWidth / 50;
+        this.radius = innerWidth / 500;
+        const scaleFactor = this.radius / this.model.geometry.parameters.radius;
+        this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
     }
 
-    private collisionDetection() {
+/*     private collisionDetection() {
         //collision
         this.enemy.list.forEach((element, index) => {
             if (distance(element.x, element.y, this.x, this.y) - (element.radius + this.radius) < 0) {
@@ -94,10 +77,9 @@ export default class Player {
                 this.health--;
             }
         });
-    };
+    }; */
 
     public update() {
-        this.collisionDetection();
-        this.draw();
+        //this.collisionDetection();
     }
 }
