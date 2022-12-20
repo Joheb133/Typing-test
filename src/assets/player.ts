@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import EnemyHandler from "./EnemyHandler.js";
-import distance from "../utils/distance.js";
+import EnemyHandler from "./EnemyHandler";
+import distance from "../utils/distance";
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 export default class Player{
     x: number = innerWidth / 2;
@@ -13,9 +14,11 @@ export default class Player{
     enemy: EnemyHandler;
     scene: THREE.Scene;
     model: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+    cssRenderer: CSS2DRenderer;
 
-    constructor(scene: THREE.Scene, enemy: EnemyHandler) {
+    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemy: EnemyHandler) {
         this.scene = scene;
+        this.cssRenderer = cssRenderer;
         this.enemy = enemy;
         //this.enemy = enemy;
         this.initialize();
@@ -75,9 +78,10 @@ export default class Player{
         this.enemy.list.forEach((element, index) => {
             if (distance(element.model.position.x, element.model.position.y, 0, 0) <= this.radius+element.radius) {
                 //destroy enemy on collision
-                this.scene.remove(element.model) //remove enemy model
+                this.scene.remove(element.model) //remove enemy model + text(text is attached so it gets removed)
                 element.model.geometry.dispose(); //clean memory
                 element.model.material.dispose();
+                this.cssRenderer.domElement.removeChild(element.textObj.element) // remove text element
                 this.enemy.list.splice(index, 1)  //remove enemy from enemy handlers list
 
                 this.health--;

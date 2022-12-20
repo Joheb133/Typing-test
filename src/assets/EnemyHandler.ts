@@ -10,6 +10,7 @@ export default class EnemyHandler {
     scene: THREE.Scene;
 
     constructor(scene: THREE.Scene) {
+
         this.scene = scene;
         this.initialize();
     }
@@ -38,8 +39,12 @@ export default class EnemyHandler {
     update() {
         //enemy physics
         this.list.forEach(element => {
-            element.model.position.x -= Math.cos(element.radian) / 5
-            element.model.position.y -= Math.sin(element.radian) / 5
+            //update enemy x, y
+            element.x -= Math.cos(element.radian) / 5;
+            element.y -= Math.sin(element.radian) / 5;
+            //update model position
+            element.model.position.x = element.x;
+            element.model.position.y = element.y;
         });
         // this.list.forEach(element => {
         //     element.drawText()
