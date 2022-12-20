@@ -81,7 +81,6 @@ export default class Player{
                 this.enemy.list.splice(index, 1)  //remove enemy from enemy handlers list
 
                 this.health--;
-                console.log(this.scene.children)
             }
         });
     };

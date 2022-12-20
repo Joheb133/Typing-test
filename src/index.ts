@@ -3,7 +3,6 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
-import { Vector3 } from 'three';
 
 //setup
 let width: number = window.innerWidth;
@@ -35,6 +34,7 @@ window.addEventListener('resize', () => {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     player.resize();
+    enemy.resize();
 })
 
 //animator

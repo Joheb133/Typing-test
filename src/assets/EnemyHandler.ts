@@ -46,18 +46,9 @@ export default class EnemyHandler {
         // })
     }
 
-    // resize() {
-    //     //find difference between previous screen size vs new screen size
-    //     const differnceX = this.previousWidth - (window.innerWidth / 2);
-    //     const differnceY = this.previousHeight - (window.innerHeight / 2);
-    //     //update screen size
-    //     this.previousWidth = window.innerWidth / 2;
-    //     this.previousHeight = window.innerHeight / 2;
-    //     this.list.forEach(element => {
-    //         element.resize(); //change radius
-    //         //add offset(difference)
-    //         element.x -= differnceX;
-    //         element.y -= differnceY;
-    //     })
-    // }
+    resize() {
+        this.list.forEach(element => {
+            element.resize(); //change radius
+        })
+    }
 }
