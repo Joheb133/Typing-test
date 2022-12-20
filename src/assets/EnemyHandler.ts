@@ -18,13 +18,13 @@ export default class EnemyHandler {
 
     initialize() {
         //=>load model<=
-        this.createEnemy(100);
+        this.createEnemy(20);
     }
 
     private createEnemy(length: number) {
         const radius = 5; //enemy creation radius
         for (let i = 0; i < length; i++) {
-            const radian = (Math.PI * 2) / 80; // divide circle by fixed amount. There are problems when adding new enemies when using length
+            const radian = (Math.PI * 2) / 20; // divide circle by fixed amount. There are problems when adding new enemies when using length
             const offset = getRndFloat(60, 400, 5); // 60, 400 is a nice sweet spot
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
             // (radian * i) allows access to each incision of the circle. This is like saying radian * 1 ... radian * 2 etc.
