@@ -1,41 +1,34 @@
-import { Context } from "vm";
+import * as THREE from 'three';
 
 export default class Enemy {
     x: number;
     y: number;
-    radius: number = innerWidth / 100;
+    radius: number = innerWidth / 500;
     radian: number;
     word: string;
-    ctx: Context
-    constructor(ctx: Context, x: number, y: number, radian: number, word: string) {
-        this.ctx = ctx
+    scene: THREE.Scene;
+    model: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>
+    constructor(scene: THREE.Scene, x: number, y: number, radian: number, word: string) {
+        this.scene = scene;
         this.x = x;
         this.y = y
         this.radian = radian;
         this.word = word;
+        this.draw();
     }
 
     draw() {
-        this.drawText();
-        this.drawCircle();
+        const geometry = new THREE.SphereGeometry(this.radius, 16, 16);
+        const mesh = new THREE.MeshBasicMaterial({color: 0x34eb77});
+        this.model = new THREE.Mesh(geometry, mesh);
+        this.scene.add(this.model)
+        this.model.position.set(this.x, this.y, 0)
     };
-    drawText() {
-        const ctx = this.ctx;
-        ctx.font = '16px Arial';
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center'
-        ctx.fillText(this.word, this.x, this.y + this.radius + 16)
-    }
-    drawCircle() {
-        const ctx = this.ctx;
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = '#FFFFFF'
-        ctx.fill();
-    }
 
     resize() {
-        this.radius = innerWidth / 100;
+        this.radius = innerWidth / 500;
+        const scaleFactor = this.radius / this.model.geometry.parameters.radius;
+        this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
     }
 }
 
