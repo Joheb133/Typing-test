@@ -22,14 +22,14 @@ cssRenderer.domElement.style.top = '0';
 document.body.appendChild(cssRenderer.domElement);
 //camera
 const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
-camera.position.set(0, 0, 100)
+camera.position.set(0, 0, 50)
 camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 const scene = new THREE.Scene(); //create scene
 
 const light = new THREE.AmbientLight(0x404040, 1)
 scene.add(light)
-scene.background = new THREE.Color(0xf5f5f5)
+scene.background = new THREE.Color(0xf4f4f4)
 
 //create player + enemy
 const enemy = new EnemyHandler(scene)
@@ -45,7 +45,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     //resize cssrenderer
     cssRenderer.setSize(width, height);
-    player.resize();
+    //player.resize();
     enemy.resize();
 })
 

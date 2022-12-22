@@ -3,6 +3,6 @@ module.exports = {
     outDir: 'dist',
     assets: ['public'],
     plugins: [],
-    transforms: [],
+    transforms: []
     // other options...
 };
