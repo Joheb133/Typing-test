@@ -1,4 +1,5 @@
-module.exports = {
+
+export default {
     entry: 'src/index.ts',
     outDir: 'dist',
     assets: ['public'],

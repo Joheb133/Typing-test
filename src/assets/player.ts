@@ -5,7 +5,6 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import EnemyHandler from "./EnemyHandler";
 import Enemy from './enemy';
 import distance from "../utils/distance";
-import { Mesh } from 'three';
 
 export default class Player {
     x: number = innerWidth / 2;
@@ -17,16 +16,16 @@ export default class Player {
 
     enemy: EnemyHandler;
     scene: THREE.Scene;
-    model: THREE.Group;
+    model: THREE.Mesh;
+    group: THREE.Group
     cssRenderer: CSS2DRenderer;
     textObj: CSS2DObject;
-    private readonly mtlLoader = new MTLLoader();
-    private readonly objLoader = new OBJLoader();
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemy: EnemyHandler) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
         this.enemy = enemy;
+        this.group = new THREE.Group();
         //this.enemy = enemy;
         this.initialize();
     }
@@ -35,34 +34,30 @@ export default class Player {
         //=>load model<=
         const rad = Math.PI / 180
         this.model = await this.laodPlayerModel();
-        this.scene.add(this.model)
+        this.group.add(this.model)
 
         //model properties
         this.model.scale.set(2, 2, 2)
-        const mesh = this.model.children[0] as THREE.Mesh;
-        mesh.geometry.center()
-        this.model.rotation.set(90*rad, rad*180, 0)
-        console.log(this.model)
+        this.model.geometry.center()
+        this.model.rotation.set(90 * rad, rad * 180, 0)
         //create text
         const span = document.createElement('span')
         this.textObj = new CSS2DObject(span);
-        this.model.add(this.textObj);
+        this.group.add(this.textObj);
         this.textObj.position.set(0, 0, -4);
+
+        //add group to scene
+        this.scene.add(this.group)
 
         //Key inputs
         document.addEventListener('keydown', (e) => this.updatePhysics(e))
     }
 
     private updatePhysics(e: KeyboardEvent) { //player input
-        if (e.code === 'Enter') return;
         if (e.code === 'Backspace') { //remove 1 character from user input
             this.input = this.input.slice(0, this.input.length - 1);
             this.textObj.element.innerHTML = this.input;
             return; //don't check other if statements
-        };
-        if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
-            this.input += e.key; //add character input
-            this.textObj.element.innerHTML = this.input;
         };
         if (e.code === 'Space') { //read input
             let splicedEnemy: boolean = false;
@@ -87,12 +82,17 @@ export default class Player {
             this.input = ''; // reset input
             this.textObj.element.innerHTML = this.input;
         };
+        if(e.key.length > 2) return
+        if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
+            this.input += e.key; //add character input
+            this.textObj.element.innerHTML = this.input;
+        };
     }
 
     private collisionDetection() {
         //collision
         this.enemy.list.forEach((element, index) => {
-            if (distance(element.model.position.x, element.model.position.y, 0, 0) <= this.radius + element.radius) {
+            if (distance(element.model.position.x, element.model.position.y, 0, 0) <= this.radius + element.width) {
                 //destroy enemy on collision
                 this.destroyEnemy(element)
                 this.enemy.list.splice(index, 1)  //remove enemy from enemy handlers list
@@ -110,13 +110,22 @@ export default class Player {
     }
 
     private async laodPlayerModel() {
-        const mtl = await this.mtlLoader.loadAsync('/assets/warship/Warship.mtl');
+        const textureLoader = new THREE.TextureLoader();
+        const lightMap = textureLoader.load('/assets/warship/lightMap.png') as any;
+        const map = textureLoader.load('/assets/warship/Warship.png')
+
+        const mtlLoader = new MTLLoader();
+        const objLoader = new OBJLoader();
+        const mtl = await mtlLoader.loadAsync('/assets/warship/Warship.mtl');
         mtl.preload();
 
-        this.objLoader.setMaterials(mtl);
-        const model = await this.objLoader.loadAsync('/assets/warship/Warship.obj');
+        const obj = await objLoader.loadAsync('/assets/warship/Warship.obj');
+        const objMesh = obj.children[0] as THREE.Mesh
+        const material = new THREE.MeshPhongMaterial({map: map, emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1.2})
 
-        return model
+        const mesh = new THREE.Mesh(objMesh.geometry, material)
+
+        return mesh;
     }
 
     // public resize() {

@@ -10,7 +10,7 @@ export default class EnemyHandler {
     scene: THREE.Scene;
     speed: number;
 
-    constructor(scene: THREE.Scene) {
+    constructor( scene: THREE.Scene) {
         this.scene = scene;
         this.speed = 1/20;
         this.initialize();

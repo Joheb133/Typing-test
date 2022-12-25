@@ -6,3 +6,8 @@ Ka 0.000 0.000 0.000
 Kd 1.000 1.000 1.000
 Ks 0.000 0.000 0.000
 map_Kd Warship.png
+
+newmtl lightMapMaterial
+illum 1
+map_Ka lightMap.png
+map_Kd -bm 1
