@@ -39,7 +39,8 @@ export default class Player {
         //model properties
         this.model.scale.set(2, 2, 2)
         this.model.geometry.center()
-        this.model.rotation.set(90 * rad, rad * 180, 0)
+        this.model.position.set(0, 5, 0)
+        this.model.rotation.set(0 * rad, rad * 180, rad * 0)
         //create text
         const span = document.createElement('span')
         this.textObj = new CSS2DObject(span);
@@ -121,7 +122,11 @@ export default class Player {
 
         const obj = await objLoader.loadAsync('/assets/warship/Warship.obj');
         const objMesh = obj.children[0] as THREE.Mesh
-        const material = new THREE.MeshPhongMaterial({map: map, emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1.2})
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x818181,
+            map: map, 
+            emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1,
+        })
 
         const mesh = new THREE.Mesh(objMesh.geometry, material)
 

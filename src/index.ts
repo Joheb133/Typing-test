@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
+import { Reflector } from 'three/examples/jsm/objects/Reflector';
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
 
@@ -30,33 +31,28 @@ document.body.appendChild(cssRenderer.domElement);
 
 //camera
 const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-camera.position.set(-40, -40, 40)
+camera.position.set(-20, 20, 20) //default was -40, -40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
-camera.up.set(0, 0, 1)
-
 
 //post processing
-const renderScene = new RenderPass(scene, camera);
-const composer = new EffectComposer(renderer);
-composer.addPass(renderScene)
 
-const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.75,
-    1,
-    0
-)
-composer.addPass(bloomPass)
-
-
-//orbit controls
-const controls = new OrbitControls(camera, canvas);
 
 //lighting
-const light = new THREE.PointLight(0xffffff)
-light.position.set(0, 0, 50)
-scene.add(light)
-//scene.background = new THREE.Color(0xf4f4f4)
+const light = new THREE.PointLight(0xffffff, 1, 200)
+light.position.set(0, 20, 0)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
+//scene.add(light, ambientLight)
+
+//create plane
+const planeGeo = new THREE.BoxGeometry(20, 0.5, 20);
+const plane = new Reflector( planeGeo, {
+    clipBias: 0.005,
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    color: 0x777777
+});
+plane.position.set(0, 0, 0)
+scene.add(plane)
 
 //create player + enemy
 const enemy = new EnemyHandler(scene)
@@ -67,11 +63,12 @@ window.addEventListener('resize', () => {
     width = window.innerWidth;
     height = window.innerHeight;
     renderer.setSize(width, height)
+    cssRenderer.setSize(width, height);
+
     //resize camera
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    //resize cssrenderer
-    cssRenderer.setSize(width, height);
+    
     //player.resize();
     enemy.resize();
 })
@@ -81,7 +78,7 @@ function animator() {
     requestAnimationFrame(animator)
     enemy.update()
     player.update()
-    composer.render();
+    renderer.render(scene, camera)
     cssRenderer.render(scene, camera)
 }
 animator();
