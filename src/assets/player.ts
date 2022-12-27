@@ -1,40 +1,30 @@
 import * as THREE from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import EnemyHandler from "./EnemyHandler";
-import Enemy from './enemy';
 import distance from "../utils/distance";
 
 export default class Player {
-    x: number = innerWidth / 2;
-    y: number = innerHeight / 2;
-    radius: number = innerWidth / 500;
     health: number = 200;
     input: string = '';
     removedEnemies: number = 0;
 
-    enemy: EnemyHandler;
+    enemyList: THREE.Mesh [] = [];
     scene: THREE.Scene;
     model: THREE.Mesh;
-    group: THREE.Group
-    cssRenderer: CSS2DRenderer;
     textObj: CSS2DObject;
+    cssRenderer: CSS2DRenderer;
 
-    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemy: EnemyHandler) {
+    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh []) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
-        this.enemy = enemy;
-        this.group = new THREE.Group();
-        //this.enemy = enemy;
+        this.enemyList = enemyList;
         this.initialize();
     }
 
     private async initialize() {
         //=>load model<=
-        const rad = Math.PI / 180
         this.model = await this.laodPlayerModel();
-        this.group.add(this.model)
+        const rad = Math.PI / 180
 
         //model properties
         this.model.scale.set(2, 2, 2)
@@ -44,11 +34,11 @@ export default class Player {
         //create text
         const span = document.createElement('span')
         this.textObj = new CSS2DObject(span);
-        this.group.add(this.textObj);
+        this.model.add(this.textObj);
         this.textObj.position.set(0, 0, -4);
 
         //add group to scene
-        this.scene.add(this.group)
+        this.scene.add(this.model)
 
         //Key inputs
         document.addEventListener('keydown', (e) => this.updatePhysics(e))
@@ -62,10 +52,11 @@ export default class Player {
         };
         if (e.code === 'Space') { //read input
             let splicedEnemy: boolean = false;
-            for (const [index, element] of this.enemy.list.entries()) {
-                if (this.input === element.word) { //if input = word run code then break out of loop. No need to check the whole loop if input = word
+            for (const [index, element] of this.enemyList.entries()) {
+                const textObj = element.getObjectByName('text') as CSS2DObject;
+                if (this.input === textObj.element.innerText) { //if input = word run code then break out of loop. No need to check the whole loop if input = word
                     this.destroyEnemy(element);
-                    this.enemy.list.splice(index, 1);
+                    this.enemyList.splice(index, 1);
                     splicedEnemy = true;
                     //score
                     this.removedEnemies++;
@@ -92,46 +83,50 @@ export default class Player {
 
     private collisionDetection() {
         //collision
-        this.enemy.list.forEach((element, index) => {
-            if (distance(element.model.position.x, element.model.position.y, 0, 0) <= this.radius + element.width) {
+        this.enemyList.forEach((element, index) => {
+            if (distance(element.position.x, element.position.z, 0, 0) <= 5) {
                 //destroy enemy on collision
                 this.destroyEnemy(element)
-                this.enemy.list.splice(index, 1)  //remove enemy from enemy handlers list
+                this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
                 this.health--;
             }
         });
     };
 
-    private destroyEnemy(element: Enemy) {
-        this.scene.remove(element.model) //remove enemy model + text(text is attached so it gets removed)
-        element.model.geometry.dispose(); //clean memory
-        element.model.material.dispose();
-        this.cssRenderer.domElement.removeChild(element.textObj.element) // remove text element
-    }
+    private destroyEnemy(element: THREE.Mesh) {
+        this.scene.remove(element);
+        element.children.forEach(child => {
+            if(child.type == 'Mesh') {
+                const mesh = child as THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            } else if (child.type == 'Object3D' && this.cssRenderer.domElement.children.length > 1) {
+                const textObj = element.getObjectByName('text') as CSS2DObject;
+                this.cssRenderer.domElement.removeChild(textObj.element)
+            }
+        });
+    };
 
     private async laodPlayerModel() {
         const textureLoader = new THREE.TextureLoader();
         const lightMap = textureLoader.load('/assets/warship/lightMap.png') as any;
         const map = textureLoader.load('/assets/warship/Warship.png')
 
-        const mtlLoader = new MTLLoader();
         const objLoader = new OBJLoader();
-        const mtl = await mtlLoader.loadAsync('/assets/warship/Warship.mtl');
-        mtl.preload();
 
         const obj = await objLoader.loadAsync('/assets/warship/Warship.obj');
         const objMesh = obj.children[0] as THREE.Mesh
         const material = new THREE.MeshPhongMaterial({
             color: 0x818181,
-            map: map, 
-            emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1,
+            map: map, //object skin
+            emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1, //parts that glow
         })
 
         const mesh = new THREE.Mesh(objMesh.geometry, material)
 
         return mesh;
-    }
+    };
 
     // public resize() {
     //     this.radius = innerWidth / 500;
@@ -141,5 +136,5 @@ export default class Player {
 
     public update() {
         this.collisionDetection();
-    }
+    };
 }

@@ -1,39 +1,67 @@
 import * as THREE from 'three'
-import Enemy from "./enemy";
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer'
 import { dictionary } from "./dictionary";
 import getRndFloat from "../utils/rng";
 
 export default class EnemyHandler {
-    list: Enemy[] = [];
-    previousWidth: number = window.innerWidth / 2;
-    previousHeight: number = window.innerHeight / 2;
+    list: THREE.Mesh [] = [];
+    // previousWidth: number = window.innerWidth / 2;
+    // previousHeight: number = window.innerHeight / 2;
     scene: THREE.Scene;
     speed: number;
+    model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>;
+    textObj: CSS2DObject;
 
-    constructor( scene: THREE.Scene) {
+    constructor(scene: THREE.Scene) {
         this.scene = scene;
-        this.speed = 1/20;
+        this.speed = 1 / 100;
+        this.model = this.createModel()
         this.initialize();
     }
 
     initialize() {
         //=>load model<=
-        this.createEnemy(0);
+        this.createEnemy(100);
     }
 
     private createEnemy(length: number) {
-        const radius = 5; //enemy creation radius
+        const buffer = 20;
         for (let i = 0; i < length; i++) {
-            const radian = (Math.PI * 2) / 20; // divide circle by fixed amount. There are problems when adding new enemies when using length
-            const offset = getRndFloat(60, 400, 5); // 60, 400 is a nice sweet spot
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
-            // (radian * i) allows access to each incision of the circle. This is like saying radian * 1 ... radian * 2 etc.
-            // because the circle(Math.PI * 2) is divided by length, we can access each division by multiplying radian by a number
-            // in this case Max number would be length, at which the loop ends
-            const x = (Math.cos(radian * offset) * (radius + (offset))); // cos(radian * i) set xPos //cos is used to access x-axis // multiply by radius because cos and sin gives numbers from 0-1. This gives the radius circles will spawn around + offset
-            const y = (Math.sin(radian * offset) * (radius + (offset))); // sin(radian * i) set yPos //sin is used access y-axiss
-            const enemy = new Enemy(this.scene, x, y, radian * offset, word);
-            this.list.push(enemy);
+            const mesh = this.model.clone();
+
+            //position
+            mesh.position.x = getRndFloat(-100, 100, 1);
+            mesh.position.y = 5;
+            mesh.position.z = getRndFloat(-100, 100, 1);
+
+
+            //add buffer if needed
+            const x = mesh.position.x;
+            const z = mesh.position.z;
+            if(Math.abs(x) < buffer && Math.abs(z) < buffer) {
+                if(Math.abs(x) / x == 1) {
+                    mesh.position.x += buffer;
+                } else {
+                    mesh.position.x -= buffer;
+                };
+
+                if(Math.abs(z) / z == 1) {
+                    mesh.position.z -= buffer;
+                } else {
+                    mesh.position.z += buffer;
+                };
+            }
+
+            //draw text
+            const span = document.createElement('span')
+            const text = new CSS2DObject(span);
+            text.name = 'text';
+            span.innerText = word;
+            mesh.add(text);
+            text.position.set(0, -0.5, 0);
+            this.list.push(mesh);
+            this.scene.add(mesh);
         }
     }
 
@@ -41,20 +69,35 @@ export default class EnemyHandler {
         //enemy physics
         this.list.forEach(element => {
             //update enemy x, y
-            element.x -= Math.cos(element.radian) * this.speed;
-            element.y -= Math.sin(element.radian) * this.speed;
-            //update model position
-            element.model.position.x = element.x;
-            element.model.position.y = element.y;
+            const x = element.position.x;
+            const z = element.position.z;
+            const angle = Math.atan2(-z, -x);
+            element.position.x += Math.cos(angle) * this.speed;
+            element.position.z += Math.sin(angle) * this.speed;
         });
-        // this.list.forEach(element => {
-        //     element.drawText()
-        // })
     }
 
-    resize() {
-        this.list.forEach(element => {
-            element.resize(); //change radius
-        })
+    // resize() {
+    //     this.list.forEach(element => {
+    //         element.resize(); //change radius
+    //     })
+    // }
+
+    private createModel() {
+        const mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhongMaterial({ color: 0x822828 })
+        )
+        const subMesh1 = new THREE.Mesh(
+            new THREE.BoxGeometry(0.5, 1.5, 0.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+        )
+        const subMesh2 = new THREE.Mesh(
+            new THREE.BoxGeometry(1.5, 0.5, 0.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+        )
+        const subMesh3 = new THREE.Mesh(
+            new THREE.BoxGeometry(0.5, 0.5, 1.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+        )
+
+        mesh.add(subMesh1, subMesh2, subMesh3)
+        return mesh
     }
 }

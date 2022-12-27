@@ -31,7 +31,7 @@ document.body.appendChild(cssRenderer.domElement);
 
 //camera
 const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-camera.position.set(-20, 20, 20) //default was -40, -40, 40
+camera.position.set(0, 40, 40) //default was -40, -40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 //post processing
@@ -40,8 +40,9 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 //lighting
 const light = new THREE.PointLight(0xffffff, 1, 200)
 light.position.set(0, 20, 0)
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
-//scene.add(light, ambientLight)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0)
+scene.add(light, ambientLight)
+scene.background = new THREE.Color(0x6a6a6a)
 
 //create plane
 const planeGeo = new THREE.BoxGeometry(20, 0.5, 20);
@@ -56,7 +57,7 @@ scene.add(plane)
 
 //create player + enemy
 const enemy = new EnemyHandler(scene)
-const player = new Player(scene, cssRenderer, enemy);
+const player = new Player(scene, cssRenderer, enemy.list);
 
 //resize
 window.addEventListener('resize', () => {
@@ -70,7 +71,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     
     //player.resize();
-    enemy.resize();
+    //enemy.resize();
 })
 
 //animator
