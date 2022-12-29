@@ -21,7 +21,7 @@ export default class EnemyHandler {
 
     initialize() {
         //=>load model<=
-        this.createEnemy(100);
+        this.createEnemy(0);
     }
 
     private createEnemy(length: number) {

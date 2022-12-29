@@ -1,12 +1,9 @@
 import * as THREE from 'three';
-import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
-import { Reflector } from 'three/examples/jsm/objects/Reflector';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib';
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper';
 
 //setup
 let width: number = window.innerWidth;
@@ -27,37 +24,92 @@ const cssRenderer = new CSS2DRenderer();
 cssRenderer.setSize(width, height);
 cssRenderer.domElement.style.position = 'absolute';
 cssRenderer.domElement.style.top = '0';
+cssRenderer.domElement.className = 'text-renderer'
 document.body.appendChild(cssRenderer.domElement);
 
 //camera
-const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-camera.position.set(0, 40, 40) //default was -40, -40, 40
+const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 500);
+camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 //post processing
 
 
 //lighting
-const light = new THREE.PointLight(0xffffff, 1, 200)
-light.position.set(0, 20, 0)
-const ambientLight = new THREE.AmbientLight(0xffffff, 0)
-scene.add(light, ambientLight)
-scene.background = new THREE.Color(0x6a6a6a)
+const spotLight = new THREE.SpotLight(0xffffff, 1.25, 30, Math.PI/3, 0, 1.25);
+spotLight.position.set(5, 15, 0);
+scene.add(spotLight);
+
+const spotLightHelper = new THREE.SpotLightHelper(spotLight)
+spotLight.add(spotLightHelper)
+
+//ship lighting
+RectAreaLightUniformsLib.init();
+const shipBottomLights = new THREE.Group();
+
+const rLight1 = new THREE.RectAreaLight(0xff0600, 10, 4, 3);
+rLight1.position.set(0, 4, 6)
+
+const rLight2 = new THREE.RectAreaLight(0x004cff, 40, 0.5, 3);
+rLight2.position.set(-2, 4, 0);
+
+const rLight3 = new THREE.RectAreaLight(0x004cff, 40, 0.5, 3);
+rLight3.position.set(2, 4, 0);
+
+const rLight4 = new THREE.RectAreaLight(0xffffff, 10, 2, 2);
+rLight4.position.set(0, 4, -6);
+
+shipBottomLights.add(rLight1, rLight2, rLight3, rLight4);
+shipBottomLights.children.forEach((element) => { //look to ground
+    const light = element as THREE.RectAreaLight;
+    light.rotateX(Math.PI * -0.5);
+    const lightHelper = new RectAreaLightHelper(light);
+    light.add(lightHelper);
+});
+scene.add(shipBottomLights);
 
 //create plane
-const planeGeo = new THREE.BoxGeometry(20, 0.5, 20);
-const plane = new Reflector( planeGeo, {
-    clipBias: 0.005,
-    textureWidth: window.innerWidth * window.devicePixelRatio,
-    textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 0x777777
-});
-plane.position.set(0, 0, 0)
+function createPlane() {
+    const textureLoader = new THREE.TextureLoader();
+    const normalMap = textureLoader.load('/textures/terrain-normal.jpg');
+    const roughnessMap = textureLoader.load('/textures/terrain-roughness.jpg');
+
+    function useEffect() {
+        [normalMap, roughnessMap].forEach((t) =>{
+            t.wrapS = THREE.RepeatWrapping;
+            t.wrapT = THREE.RepeatWrapping;
+            t.repeat.set(6, 6); 
+        });
+
+        normalMap.encoding = THREE.LinearEncoding;
+        roughnessMap.encoding = THREE.LinearEncoding;
+    };
+
+    useEffect()
+
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+        new THREE.MeshStandardMaterial({
+            color: 0x080808,
+            normalMap: normalMap,
+            roughnessMap: roughnessMap, roughness: 0.55,
+            metalness: 1,
+        })
+    );
+    plane.rotation.set(Math.PI * -0.5, 0, 0);
+
+    return plane as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>
+}
+const plane = createPlane()
 scene.add(plane)
 
 //create player + enemy
 const enemy = new EnemyHandler(scene)
 const player = new Player(scene, cssRenderer, enemy.list);
+
+//configure layers
+
+
+//console.log(dLight.layers.mask, plane.layers.mask)
 
 //resize
 window.addEventListener('resize', () => {
@@ -69,7 +121,7 @@ window.addEventListener('resize', () => {
     //resize camera
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    
+
     //player.resize();
     //enemy.resize();
 })

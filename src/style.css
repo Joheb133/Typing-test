@@ -6,3 +6,7 @@ body {
 canvas {
     display: block;
 }
+
+.text-renderer span {
+    color: #fff;
+}

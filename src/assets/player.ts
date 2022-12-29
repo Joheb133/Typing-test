@@ -24,6 +24,7 @@ export default class Player {
     private async initialize() {
         //=>load model<=
         this.model = await this.laodPlayerModel();
+        this.model.layers.set(0)
         const rad = Math.PI / 180
 
         //model properties
