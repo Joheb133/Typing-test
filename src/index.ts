@@ -4,6 +4,7 @@ import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLigh
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper';
+import { SelectiveBloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect, SMAAPreset } from "postprocessing";
 
 //setup
 let width: number = window.innerWidth;
@@ -14,7 +15,9 @@ const scene = new THREE.Scene(); //create scene
 
 //renderer
 const renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    powerPreference: "high-performance",
+    antialias: false,
+    stencil: false,
     canvas: canvas
 });
 renderer.setSize(width, height)
@@ -32,10 +35,7 @@ const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 500);
 camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-//post processing
-
-
-//lighting
+//scene lighting
 const spotLight = new THREE.SpotLight(0xffffff, 1.25, 30, Math.PI/3, 0, 1.25);
 spotLight.position.set(5, 15, 0);
 scene.add(spotLight);
@@ -47,17 +47,17 @@ spotLight.add(spotLightHelper)
 RectAreaLightUniformsLib.init();
 const shipBottomLights = new THREE.Group();
 
-const rLight1 = new THREE.RectAreaLight(0xff0600, 10, 4, 3);
+const rLight1 = new THREE.RectAreaLight(0xff0600, 30, 5, 4);
 rLight1.position.set(0, 4, 6)
 
 const rLight2 = new THREE.RectAreaLight(0x004cff, 40, 0.5, 3);
-rLight2.position.set(-2, 4, 0);
+rLight2.position.set(-2, 3, 0);
 
 const rLight3 = new THREE.RectAreaLight(0x004cff, 40, 0.5, 3);
-rLight3.position.set(2, 4, 0);
+rLight3.position.set(2, 3, 0);
 
-const rLight4 = new THREE.RectAreaLight(0xffffff, 10, 2, 2);
-rLight4.position.set(0, 4, -6);
+const rLight4 = new THREE.RectAreaLight(0xffffff, 15, 1, 1);
+rLight4.position.set(0, 3, -6);
 
 shipBottomLights.add(rLight1, rLight2, rLight3, rLight4);
 shipBottomLights.children.forEach((element) => { //look to ground
@@ -87,7 +87,7 @@ function createPlane() {
 
     useEffect()
 
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(50, 50),
         new THREE.MeshStandardMaterial({
             color: 0x080808,
             normalMap: normalMap,
@@ -102,14 +102,30 @@ function createPlane() {
 const plane = createPlane()
 scene.add(plane)
 
+//post processing
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
 //create player + enemy
 const enemy = new EnemyHandler(scene)
 const player = new Player(scene, cssRenderer, enemy.list);
 
-//configure layers
+async function loadPlayerEnemy() {
+    await enemy.initialize();
+    await player.initialize();
 
+    const bloomEffect = new SelectiveBloomEffect(scene, camera, {
+        intensity: 1,
+        luminanceThreshold: 0.2
+    });
+    bloomEffect.selection.add(player.model)
+    composer.addPass(new EffectPass(camera, bloomEffect));
+    composer.addPass(new EffectPass(camera, new SMAAEffect({
+        preset: 3
+    })))
+}
 
-//console.log(dLight.layers.mask, plane.layers.mask)
+loadPlayerEnemy()
 
 //resize
 window.addEventListener('resize', () => {
@@ -131,7 +147,7 @@ function animator() {
     requestAnimationFrame(animator)
     enemy.update()
     player.update()
-    renderer.render(scene, camera)
+    composer.render()
     cssRenderer.render(scene, camera)
 }
 animator();

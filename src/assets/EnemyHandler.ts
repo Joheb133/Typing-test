@@ -9,7 +9,7 @@ export default class EnemyHandler {
     // previousHeight: number = window.innerHeight / 2;
     scene: THREE.Scene;
     speed: number;
-    model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>;
+    model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
     textObj: CSS2DObject;
 
     constructor(scene: THREE.Scene) {
@@ -19,9 +19,9 @@ export default class EnemyHandler {
         this.initialize();
     }
 
-    initialize() {
+    async initialize() {
         //=>load model<=
-        this.createEnemy(0);
+        this.createEnemy(5);
     }
 
     private createEnemy(length: number) {
@@ -85,16 +85,16 @@ export default class EnemyHandler {
 
     private createModel() {
         const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhongMaterial({ color: 0x822828 })
+            new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x822828 })
         )
         const subMesh1 = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 1.5, 0.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(0.5, 1.5, 0.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
         )
         const subMesh2 = new THREE.Mesh(
-            new THREE.BoxGeometry(1.5, 0.5, 0.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(1.5, 0.5, 0.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
         )
         const subMesh3 = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 0.5, 1.5), new THREE.MeshPhongMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(0.5, 0.5, 1.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
         )
 
         mesh.add(subMesh1, subMesh2, subMesh3)

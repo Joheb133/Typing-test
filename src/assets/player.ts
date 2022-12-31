@@ -18,13 +18,11 @@ export default class Player {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
         this.enemyList = enemyList;
-        this.initialize();
     }
 
-    private async initialize() {
+    async initialize() {
         //=>load model<=
         this.model = await this.laodPlayerModel();
-        this.model.layers.set(0)
         const rad = Math.PI / 180
 
         //model properties
@@ -118,7 +116,7 @@ export default class Player {
 
         const obj = await objLoader.loadAsync('/assets/warship/Warship.obj');
         const objMesh = obj.children[0] as THREE.Mesh
-        const material = new THREE.MeshPhongMaterial({
+        const material = new THREE.MeshStandardMaterial({
             color: 0x818181,
             map: map, //object skin
             emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1, //parts that glow
