@@ -139,7 +139,7 @@ async function loadPlayerEnemy() {
     })))
 }
 
-loadPlayerEnemy()
+await loadPlayerEnemy() //load before executing code below
 
 //resize
 window.addEventListener('resize', () => {

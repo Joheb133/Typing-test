@@ -8,13 +8,14 @@ export default class Player {
     input: string = '';
     removedEnemies: number = 0;
 
-    enemyList: THREE.Mesh [] = [];
+    enemyList: THREE.Mesh[] = [];
     scene: THREE.Scene;
     model: THREE.Mesh;
+    dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
     textObj: CSS2DObject;
     cssRenderer: CSS2DRenderer;
 
-    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh []) {
+    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
         this.enemyList = enemyList;
@@ -22,7 +23,7 @@ export default class Player {
 
     async initialize() {
         //=>load model<=
-        this.model = await this.laodPlayerModel();
+        this.model = await this.loadPlayerModel();
         const rad = Math.PI / 180
 
         //model properties
@@ -73,7 +74,7 @@ export default class Player {
             this.input = ''; // reset input
             this.textObj.element.innerHTML = this.input;
         };
-        if(e.key.length > 2) return
+        if (e.key.length > 2) return
         if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
             this.input += e.key; //add character input
             this.textObj.element.innerHTML = this.input;
@@ -82,10 +83,13 @@ export default class Player {
 
     private collisionDetection() {
         //collision
-        this.enemyList.forEach((element, index) => {
-            if (distance(element.position.x, element.position.z, 0, 0) <= 5) {
+        this.enemyList.forEach((enemy, index) => {
+            if (Math.abs(enemy.position.x) - Math.abs(this.dimensions.x) <= 0 &&
+                Math.abs(enemy.position.z) - Math.abs(this.dimensions.z) <= 0
+                ) {
+                console.log('destroy')
                 //destroy enemy on collision
-                this.destroyEnemy(element)
+                this.destroyEnemy(enemy)
                 this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
                 this.health--;
@@ -93,21 +97,21 @@ export default class Player {
         });
     };
 
-    private destroyEnemy(element: THREE.Mesh) {
-        this.scene.remove(element);
-        element.children.forEach(child => {
-            if(child.type == 'Mesh') {
+    private destroyEnemy(enemy: THREE.Mesh) {
+        this.scene.remove(enemy);
+        enemy.children.forEach(child => {
+            if (child.type == 'Mesh') {
                 const mesh = child as THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>
                 mesh.geometry.dispose();
                 mesh.material.dispose();
             } else if (child.type == 'Object3D' && this.cssRenderer.domElement.children.length > 1) {
-                const textObj = element.getObjectByName('text') as CSS2DObject;
+                const textObj = enemy.getObjectByName('text') as CSS2DObject;
                 this.cssRenderer.domElement.removeChild(textObj.element)
             }
         });
     };
 
-    private async laodPlayerModel() {
+    private async loadPlayerModel() {
         const textureLoader = new THREE.TextureLoader();
         const lightMap = textureLoader.load('/assets/warship/lightMap.png') as any;
         const map = textureLoader.load('/assets/warship/Warship.png')
@@ -123,6 +127,10 @@ export default class Player {
         })
 
         const mesh = new THREE.Mesh(objMesh.geometry, material)
+
+        const boundingBox = new THREE.Box3().setFromObject(mesh);
+        this.dimensions = boundingBox.getSize(new THREE.Vector3()) as THREE.Vector3;
+        console.log(this.dimensions)
 
         return mesh;
     };

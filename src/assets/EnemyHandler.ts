@@ -14,14 +14,13 @@ export default class EnemyHandler {
 
     constructor(scene: THREE.Scene) {
         this.scene = scene;
-        this.speed = 1 / 100;
+        this.speed = 1 / 50;
         this.model = this.createModel()
-        this.initialize();
     }
 
     async initialize() {
         //=>load model<=
-        this.createEnemy(5);
+        this.createEnemy(10);
     }
 
     private createEnemy(length: number) {
