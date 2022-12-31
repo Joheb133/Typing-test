@@ -97,10 +97,24 @@ function createPlane() {
     );
     plane.rotation.set(Math.PI * -0.5, 0, 0);
 
-    return plane as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>
+    const plane2 = plane.clone()
+    plane2.position.set(0, 0, plane.geometry.parameters.height/2)
+
+    const group = new THREE.Group()
+    group.add(plane, plane2)
+
+    return group
 }
-const plane = createPlane()
-scene.add(plane)
+const planes = createPlane()
+scene.add(planes)
+
+function movePlane() {
+    planes.children.forEach((plane)=>{
+        plane.position.z += 0.01;
+        if(plane.position.z >= 25) plane.position.z = -25
+    })
+}
+movePlane();
 
 //post processing
 const composer = new EffectComposer(renderer);
@@ -148,6 +162,7 @@ function animator() {
     enemy.update()
     player.update()
     composer.render()
+    movePlane()
     cssRenderer.render(scene, camera)
 }
 animator();
