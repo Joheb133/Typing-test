@@ -145,7 +145,7 @@ await loadPlayerEnemy() //load before executing code below
 window.addEventListener('resize', () => {
     width = window.innerWidth;
     height = window.innerHeight;
-    renderer.setSize(width, height)
+    composer.setSize(width, height)
     cssRenderer.setSize(width, height);
 
     //resize camera

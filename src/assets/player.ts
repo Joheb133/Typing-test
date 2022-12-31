@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import distance from "../utils/distance";
 
 export default class Player {
     health: number = 200;
@@ -130,7 +129,6 @@ export default class Player {
 
         const boundingBox = new THREE.Box3().setFromObject(mesh);
         this.dimensions = boundingBox.getSize(new THREE.Vector3()) as THREE.Vector3;
-        console.log(this.dimensions)
 
         return mesh;
     };
