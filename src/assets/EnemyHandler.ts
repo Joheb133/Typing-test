@@ -19,12 +19,11 @@ export default class EnemyHandler {
     }
 
     async initialize() {
-        //=>load model<=
-        this.createEnemy(10);
+        this.createEnemy(5);
     }
 
     private createEnemy(length: number) {
-        const buffer = 20;
+        const buffer = 20; //20 is default
         for (let i = 0; i < length; i++) {
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
             const mesh = this.model.clone();
@@ -34,22 +33,14 @@ export default class EnemyHandler {
             mesh.position.y = 5;
             mesh.position.z = getRndFloat(-100, 100, 1);
 
-
             //add buffer if needed
             const x = mesh.position.x;
             const z = mesh.position.z;
-            if(Math.abs(x) < buffer && Math.abs(z) < buffer) {
-                if(Math.abs(x) / x == 1) {
-                    mesh.position.x += buffer;
-                } else {
-                    mesh.position.x -= buffer;
-                };
 
-                if(Math.abs(z) / z == 1) {
-                    mesh.position.z -= buffer;
-                } else {
-                    mesh.position.z += buffer;
-                };
+            if(Math.abs(x) < buffer && Math.abs(z) < buffer) {
+                //Important that buffer is negative when negative position and vice versa
+                (x / Math.abs(x) == 1) ? mesh.position.x+= buffer : mesh.position.x-= buffer;
+                (z / Math.abs(z) == 1) ? mesh.position.z+= buffer : mesh.position.z-= buffer;
             }
 
             //draw text
@@ -57,8 +48,8 @@ export default class EnemyHandler {
             const text = new CSS2DObject(span);
             text.name = 'text';
             span.innerText = word;
+            text.position.set(0, -2, 0);
             mesh.add(text);
-            text.position.set(0, -0.5, 0);
             this.list.push(mesh);
             this.scene.add(mesh);
         }

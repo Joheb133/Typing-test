@@ -36,7 +36,7 @@ camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 4
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 //scene lighting
-const spotLight = new THREE.SpotLight(0xffffff, 1.25, 30, Math.PI/3, 0, 1.25);
+const spotLight = new THREE.SpotLight(0xffffff, 1, 30, Math.PI/3, 0, 1.25);
 spotLight.position.set(5, 15, 0);
 scene.add(spotLight);
 
@@ -129,7 +129,7 @@ async function loadPlayerEnemy() {
     await player.initialize();
 
     const bloomEffect = new SelectiveBloomEffect(scene, camera, {
-        intensity: 1,
+        intensity: 1.25,
         luminanceThreshold: 0.2
     });
     bloomEffect.selection.add(player.model)
