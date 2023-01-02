@@ -32,16 +32,13 @@ document.body.appendChild(cssRenderer.domElement);
 
 //camera
 const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 500);
-camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 40
+camera.position.set(-0, 340, 0) //default was -40, 40, 40 //testing is 0, 40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 //scene lighting
 const spotLight = new THREE.SpotLight(0xffffff, 1, 30, Math.PI/3, 0, 1.25);
 spotLight.position.set(5, 15, 0);
 scene.add(spotLight);
-
-const spotLightHelper = new THREE.SpotLightHelper(spotLight)
-spotLight.add(spotLightHelper)
 
 //ship lighting
 RectAreaLightUniformsLib.init();
@@ -63,8 +60,6 @@ shipBottomLights.add(rLight1, rLight2, rLight3, rLight4);
 shipBottomLights.children.forEach((element) => { //look to ground
     const light = element as THREE.RectAreaLight;
     light.rotateX(Math.PI * -0.5);
-    const lightHelper = new RectAreaLightHelper(light);
-    light.add(lightHelper);
 });
 scene.add(shipBottomLights);
 
@@ -132,7 +127,8 @@ async function loadPlayerEnemy() {
         intensity: 1.25,
         luminanceThreshold: 0.2
     });
-    bloomEffect.selection.add(player.model)
+    bloomEffect.selection.add(player.model);
+    bloomEffect.selection.add(player.laser)
     composer.addPass(new EffectPass(camera, bloomEffect));
     composer.addPass(new EffectPass(camera, new SMAAEffect({
         preset: 3
@@ -159,10 +155,11 @@ window.addEventListener('resize', () => {
 //animator
 function animator() {
     requestAnimationFrame(animator)
-    enemy.update()
+    //enemy.update()
     player.update()
     composer.render()
     movePlane()
     cssRenderer.render(scene, camera)
 }
 animator();
+

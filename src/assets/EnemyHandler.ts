@@ -4,7 +4,7 @@ import { dictionary } from "./dictionary";
 import getRndFloat from "../utils/rng";
 
 export default class EnemyHandler {
-    list: THREE.Mesh [] = [];
+    list: THREE.Mesh[] = [];
     // previousWidth: number = window.innerWidth / 2;
     // previousHeight: number = window.innerHeight / 2;
     scene: THREE.Scene;
@@ -14,7 +14,7 @@ export default class EnemyHandler {
 
     constructor(scene: THREE.Scene) {
         this.scene = scene;
-        this.speed = 1 / 50;
+        this.speed = 1 / 200;
         this.model = this.createModel()
     }
 
@@ -23,24 +23,24 @@ export default class EnemyHandler {
     }
 
     private createEnemy(length: number) {
-        const buffer = 20; //20 is default
+        const buffer = 10; //20 is default
         for (let i = 0; i < length; i++) {
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
             const mesh = this.model.clone();
 
             //position
-            mesh.position.x = getRndFloat(-100, 100, 1);
+            mesh.position.x = getRndFloat(-50, 50, 1); //defaullt -100, 100
             mesh.position.y = 5;
-            mesh.position.z = getRndFloat(-100, 100, 1);
+            mesh.position.z = getRndFloat(-50, 50, 1);
 
             //add buffer if needed
             const x = mesh.position.x;
             const z = mesh.position.z;
 
-            if(Math.abs(x) < buffer && Math.abs(z) < buffer) {
+            if (Math.abs(x) < buffer && Math.abs(z) < buffer) {
                 //Important that buffer is negative when negative position and vice versa
-                (x / Math.abs(x) == 1) ? mesh.position.x+= buffer : mesh.position.x-= buffer;
-                (z / Math.abs(z) == 1) ? mesh.position.z+= buffer : mesh.position.z-= buffer;
+                (x / Math.abs(x) == 1) ? mesh.position.x += buffer : mesh.position.x -= buffer;
+                (z / Math.abs(z) == 1) ? mesh.position.z += buffer : mesh.position.z -= buffer;
             }
 
             //draw text

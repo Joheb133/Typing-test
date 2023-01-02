@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Joheb133/Typing-test#readme",
   "dependencies": {
+    "gsap": "^3.11.4",
     "postprocessing": "^6.29.2",
     "three": "^0.147.0"
   },

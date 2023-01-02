@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { gsap } from 'gsap'
 
 export default class Player {
     health: number = 200;
@@ -13,6 +14,7 @@ export default class Player {
     dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
     textObj: CSS2DObject;
     cssRenderer: CSS2DRenderer;
+    laser: THREE.Mesh;
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
@@ -42,34 +44,54 @@ export default class Player {
 
         //Key inputs
         document.addEventListener('keydown', (e) => this.updatePhysics(e));
+
+        //create laser
+        this.laser = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 1),
+            new THREE.MeshStandardMaterial({
+                color: 0xff0600,
+                emissive: 0xff0600, envMapIntensity: 5
+            }))
+        this.laser.position.set(0, -2, 0);
+        this.model.add(this.laser)
     }
 
-    private updatePhysics(e: KeyboardEvent) { //player input
+    private async updatePhysics(e: KeyboardEvent) { //player input
         const textEl = this.textObj.element;
 
         //backspace input
-        if (e.code === 'Backspace') { 
+        if (e.code === 'Backspace') {
             this.input = this.input.slice(0, this.input.length - 1);
             textEl.innerText = this.input;
 
-            if(this.input.length == 0) textEl.style.visibility = 'hidden';
+            if (this.input.length == 0) textEl.style.visibility = 'hidden';
             return; //don't check other if statements
         };
 
         //read user input
-        if (e.code === 'Space') { 
+        if (e.code === 'Space') {
             let splicedEnemy: boolean = false;
-            
+
             //read each enemies word
-            for (const [index, element] of this.enemyList.entries()) {
-                const textObj = element.getObjectByName('text') as CSS2DObject;
+            for (const [index, enemy] of this.enemyList.entries()) {
+                const textObj = enemy.getObjectByName('text') as CSS2DObject;
 
                 //if input = enemy word
                 if (this.input === textObj.element.innerText) {
-                    this.destroyEnemy(element);
+                    const angle = Math.atan2(enemy.position.x, enemy.position.z);
+                    this.laser.rotation.set(0, angle, 0)
+                    gsap.to(this.laser.position, {
+                        x: -enemy.position.x,
+                        z: -enemy.position.z,
+                        duration: 0.2,
+                        onComplete: () => {
+                            this.laser.position.set(0, -2, 0)
+                            this.destroyEnemy(enemy);
+                        },
+                        ease: 'linear'
+                    })
+
                     this.enemyList.splice(index, 1);
                     splicedEnemy = true;
-                    
                     //score
                     this.removedEnemies++;
                     break
@@ -77,14 +99,9 @@ export default class Player {
             }
 
             //if user input wrong
-            // if (!splicedEnemy) { //if user input = wrong AKA no enemies were spliced/destroyed
-            //     splicedEnemy = false;
-            //     this.model.material.color.set(0xff3d3d)
-            //     const timer = setTimeout(() => { //red indicator
-            //         this.model.material.color.set(0x9BD8AA)
-            //         clearTimeout(timer);
-            //     }, 1000)
-            // }
+            if (!splicedEnemy) {
+                console.log('wrong')
+            }
 
             this.input = ''; // reset input
             textEl.innerHTML = this.input;
@@ -98,7 +115,7 @@ export default class Player {
         if ((e.key.charCodeAt(0) > 64 && e.key.charCodeAt(0) < 91) || (e.key.charCodeAt(0) > 96 && e.key.charCodeAt(0) < 123) || e.key.charCodeAt(0) == 45) {
             this.input += e.key;
             textEl.innerHTML = this.input;
-            if(textEl.style.visibility == 'hidden') textEl.style.visibility = 'visible'
+            if (textEl.style.visibility == 'hidden') textEl.style.visibility = 'visible'
         };
     }
 
@@ -107,7 +124,7 @@ export default class Player {
         this.enemyList.forEach((enemy, index) => {
             if (Math.abs(enemy.position.x) - Math.abs(this.dimensions.x) <= 0 &&
                 Math.abs(enemy.position.z) - Math.abs(this.dimensions.z) <= 0
-                ) {
+            ) {
                 this.destroyEnemy(enemy)
                 this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
@@ -160,6 +177,20 @@ export default class Player {
     //     const scaleFactor = this.radius / this.model.geometry.parameters.radius;
     //     this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
     // }
+
+    private shootLaser(enemy: THREE.Mesh) {
+        const angle = Math.atan2(enemy.position.x, enemy.position.z);
+        this.laser.rotation.set(0, angle, 0)
+        gsap.to(this.laser.position, {
+            x: -enemy.position.x,
+            z: -enemy.position.z,
+            duration: 0.2,
+            onComplete: function () {
+                this.laser.position.set(0, -2, 0)
+            },
+            ease: 'linear'
+        })
+    }
 
     public update() {
         this.collisionDetection();
