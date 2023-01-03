@@ -12,9 +12,10 @@ export default class Player {
     scene: THREE.Scene;
     model: THREE.Mesh;
     dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
-    textObj: CSS2DObject;
+    text: HTMLSpanElement
     cssRenderer: CSS2DRenderer;
     laser: THREE.Mesh;
+    textAnimating: boolean = false;
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
@@ -34,10 +35,13 @@ export default class Player {
         this.model.rotation.set(0 * rad, rad * 180, rad * 0)
         //create text
         const span = document.createElement('span')
-        this.textObj = new CSS2DObject(span);
-        this.model.add(this.textObj);
-        this.textObj.position.set(0, 0, -4);
+        this.cssRenderer.domElement.appendChild(span)
         span.style.visibility = 'hidden';
+        span.style.position = 'absolute';
+        span.style.top = '50%';
+        span.style.left = '50%';
+        span.style.transform = 'translate(-50%, 0)'
+        this.text = span;
 
         //add group to scene
         this.scene.add(this.model);
@@ -51,12 +55,12 @@ export default class Player {
                 color: 0xff0600,
                 emissive: 0xff0600, envMapIntensity: 5
             }))
-        this.laser.position.set(0, -2, 0);
+        this.laser.position.set(0, 0, 0);
         this.model.add(this.laser)
     }
 
     private async updatePhysics(e: KeyboardEvent) { //player input
-        const textEl = this.textObj.element;
+        const textEl = this.text;
 
         //backspace input
         if (e.code === 'Backspace') {
@@ -77,14 +81,16 @@ export default class Player {
 
                 //if input = enemy word
                 if (this.input === textObj.element.innerText) {
+                    //laser animation
                     const angle = Math.atan2(enemy.position.x, enemy.position.z);
                     this.laser.rotation.set(0, angle, 0)
                     gsap.to(this.laser.position, {
                         x: -enemy.position.x,
                         z: -enemy.position.z,
-                        duration: 0.2,
+                        duration: 0.1,
                         onComplete: () => {
-                            this.laser.position.set(0, -2, 0)
+                            //animation complete
+                            this.laser.position.set(0, 0, 0)
                             this.destroyEnemy(enemy);
                         },
                         ease: 'linear'
@@ -100,12 +106,22 @@ export default class Player {
 
             //if user input wrong
             if (!splicedEnemy) {
-                console.log('wrong')
+                //text animation
+                const tl = gsap.timeline({repeat: 2})
+                tl.to(textEl, {translateX: 5, duration: 0.03})
+                tl.to(textEl, {translateX: -5, duration: 0.03})
+                tl.to(textEl, {translateX: 5, duration: 0.03})
+                tl.to(textEl, {translateX: -5, duration: 0.03, onComplete: ()=>{
+                    // reset input when animation complete
+                    this.input = ''; 
+                    textEl.innerHTML = this.input;
+                    textEl.style.visibility = 'hidden';
+                }})
+            } else {
+                this.input = ''; // reset input
+                textEl.innerHTML = this.input;
+                textEl.style.visibility = 'hidden';
             }
-
-            this.input = ''; // reset input
-            textEl.innerHTML = this.input;
-            textEl.style.visibility = 'hidden';
         };
 
         //input is not letter
@@ -177,20 +193,6 @@ export default class Player {
     //     const scaleFactor = this.radius / this.model.geometry.parameters.radius;
     //     this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
     // }
-
-    private shootLaser(enemy: THREE.Mesh) {
-        const angle = Math.atan2(enemy.position.x, enemy.position.z);
-        this.laser.rotation.set(0, angle, 0)
-        gsap.to(this.laser.position, {
-            x: -enemy.position.x,
-            z: -enemy.position.z,
-            duration: 0.2,
-            onComplete: function () {
-                this.laser.position.set(0, -2, 0)
-            },
-            ease: 'linear'
-        })
-    }
 
     public update() {
         this.collisionDetection();

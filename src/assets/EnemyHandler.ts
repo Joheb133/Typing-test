@@ -14,24 +14,24 @@ export default class EnemyHandler {
 
     constructor(scene: THREE.Scene) {
         this.scene = scene;
-        this.speed = 1 / 200;
+        this.speed = 1 / 50;
         this.model = this.createModel()
     }
 
     async initialize() {
-        this.createEnemy(5);
+        this.createEnemy(0);
     }
 
     private createEnemy(length: number) {
-        const buffer = 10; //20 is default
+        const buffer = 20; //20 is default
         for (let i = 0; i < length; i++) {
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
             const mesh = this.model.clone();
 
             //position
-            mesh.position.x = getRndFloat(-50, 50, 1); //defaullt -100, 100
+            mesh.position.x = getRndFloat(-100, 100, 1); //defaullt -100, 100
             mesh.position.y = 5;
-            mesh.position.z = getRndFloat(-50, 50, 1);
+            mesh.position.z = getRndFloat(-100, 100, 1);
 
             //add buffer if needed
             const x = mesh.position.x;

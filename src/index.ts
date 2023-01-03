@@ -32,7 +32,7 @@ document.body.appendChild(cssRenderer.domElement);
 
 //camera
 const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 500);
-camera.position.set(-0, 340, 0) //default was -40, 40, 40 //testing is 0, 40, 40
+camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 //scene lighting
@@ -155,7 +155,7 @@ window.addEventListener('resize', () => {
 //animator
 function animator() {
     requestAnimationFrame(animator)
-    //enemy.update()
+    enemy.update()
     player.update()
     composer.render()
     movePlane()
