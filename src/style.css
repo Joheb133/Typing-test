@@ -9,6 +9,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
+    background-color: var(--black);
 }
 
 .loading-screen {
@@ -48,6 +49,54 @@ body {
     z-index: 2;
     font-weight: 700;
     color: rgb(187, 44, 44);
+}
+
+.start-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100vw;
+    height: 100vh;
+    z-index: 3;
+}
+
+.start-screen p {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px;
+    text-align: center;
+    letter-spacing: 3px;
+    color: var(--white);
+}
+
+.start-screen button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: 0 0;
+    padding: 20px 80px;
+    font-size: 2em;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    border: none;
+    border-radius: 8px;
+    transition: scale 100ms;
+}
+
+.start-screen button:hover {
+    background-color: rgb(185, 185, 185);
+    transform-origin: 0 0;
+    scale: 1.05;
+    cursor: pointer;
+    transition: scale 200ms;
+}
+
+.text-renderer {
+    z-index: 2;
 }
 
 .text-renderer span {

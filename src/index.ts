@@ -6,8 +6,11 @@ import EnemyHandler from './assets/EnemyHandler';
 import { SelectiveBloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect } from "postprocessing";
 import { gsap } from 'gsap'
 
-//setup
+// setup //
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+const startOverlay = document.querySelector('.start-screen') as HTMLDivElement;
+
+//loading screen
 const loadingEl = document.querySelector('.loading-screen') as HTMLDivElement;
 const progressEl = document.querySelector('.progress') as HTMLDivElement; //loading bar
 let progress = 0;
@@ -27,14 +30,15 @@ function updateProgress(amount: number) {
                     duration: 1,
                     onComplete: () => {
                         loadingEl.style.display = "none";
+                        startOverlay.style.display = "block";
                     }
                 })
-                canvas.style.display = "block";
             }
         }
     })
 }
-//create scene
+
+// create scene //
 const scene = new THREE.Scene();
 
 //renderer
@@ -177,11 +181,21 @@ window.addEventListener('resize', () => {
 //animator
 function animator() {
     requestAnimationFrame(animator)
-    enemy.update()
-    player.update()
-    composer.render()
-    movePlane()
-    cssRenderer.render(scene, camera)
+    enemy.update();
+    player.update();
+    composer.render();
+    movePlane();
+    cssRenderer.render(scene, camera);
 }
-animator();
 
+//play button
+const btnEl = document.querySelector("#start-game") as HTMLButtonElement;
+btnEl.addEventListener("click", ()=>{
+    gsap.to(startOverlay, {
+        opacity: 0,
+        duration: 0.25,
+        onComplete: ()=>{startOverlay.style.display = "none";}
+    })
+    animator();
+    canvas.style.display = "block";
+});
