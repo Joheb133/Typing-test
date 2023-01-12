@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer'
+import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer'
 import { dictionary } from "./dictionary";
 import getRndFloat from "../utils/rng";
 
@@ -7,22 +7,23 @@ export default class EnemyHandler {
     list: THREE.Mesh[] = [];
     // previousWidth: number = window.innerWidth / 2;
     // previousHeight: number = window.innerHeight / 2;
-    scene: THREE.Scene;
-    speed: number;
-    model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
-    textObj: CSS2DObject;
+    private scene: THREE.Scene;
+    private speed: number;
+    private model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
+    private cssRenderer: CSS2DRenderer
 
-    constructor(scene: THREE.Scene) {
+    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer) {
         this.scene = scene;
+        this.cssRenderer = cssRenderer;
         this.speed = 1 / 50;
         this.model = this.createModel()
     }
 
     async initialize() {
-        this.createEnemy(0);
+        this.createEnemy(10);
     }
 
-    private createEnemy(length: number) {
+    createEnemy(length: number) {
         const buffer = 20; //20 is default
         for (let i = 0; i < length; i++) {
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
@@ -65,6 +66,25 @@ export default class EnemyHandler {
             element.position.x += Math.cos(angle) * this.speed;
             element.position.z += Math.sin(angle) * this.speed;
         });
+    }
+
+    reset() {
+        this.list.forEach(enemy => {
+            //remove from scene
+            this.scene.remove(enemy);
+            //dispose all children of enemy
+            enemy.children.forEach(child => {
+                if (child.type == 'Mesh') {
+                    const mesh = child as THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>
+                    mesh.geometry.dispose();
+                    mesh.material.dispose();
+                } else if (child.type == 'Object3D' && this.cssRenderer.domElement.children.length > 1) {
+                    const textObj = enemy.getObjectByName('text') as CSS2DObject;
+                    this.cssRenderer.domElement.removeChild(textObj.element)
+                }
+            });
+        });
+        this.initialize();
     }
 
     // resize() {

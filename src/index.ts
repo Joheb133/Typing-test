@@ -18,7 +18,7 @@ let progress = 0;
 function updateProgress(amount: number) {
     progress += amount;
     gsap.to(progressEl, {
-        width: `+=${amount}%`,
+        width: `${progress}%`,
         duration: 0.5,
         onComplete: ()=>{
             if (progress >= 100) {
@@ -94,8 +94,8 @@ scene.add(shipBottomLights);
 //create plane
 function createPlane() {
     const textureLoader = new THREE.TextureLoader();
-    const normalMap = textureLoader.load('/textures/terrain-normal.jpg');
-    const roughnessMap = textureLoader.load('/textures/terrain-roughness.jpg');
+    const normalMap = textureLoader.load('/textures/terrain-normal-min.jpg');
+    const roughnessMap = textureLoader.load('/textures/terrain-roughness-min.jpg');
 
     function useEffect() {
         [normalMap, roughnessMap].forEach((t) => {
@@ -142,7 +142,7 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
 //create player + enemy
-const enemy = new EnemyHandler(scene)
+const enemy = new EnemyHandler(scene, cssRenderer)
 const player = new Player(scene, cssRenderer, enemy.list);
 
 async function loadPlayerEnemy() {
@@ -163,7 +163,7 @@ async function loadPlayerEnemy() {
     updateProgress(50)
 }
 
-loadPlayerEnemy() //load before executing code below
+loadPlayerEnemy()
 
 //resize
 window.addEventListener('resize', () => {
@@ -179,23 +179,43 @@ window.addEventListener('resize', () => {
 })
 
 //animator
+let animationFrameID: number;
 function animator() {
-    requestAnimationFrame(animator)
+    animationFrameID = requestAnimationFrame(animator)
     enemy.update();
     player.update();
-    composer.render();
     movePlane();
+    composer.render();
     cssRenderer.render(scene, camera);
 }
 
 //play button
 const btnEl = document.querySelector("#start-game") as HTMLButtonElement;
-btnEl.addEventListener("click", ()=>{
+const guiEl = document.querySelector(".gui") as HTMLDivElement;
+
+function startGame() {
     gsap.to(startOverlay, {
         opacity: 0,
         duration: 0.25,
-        onComplete: ()=>{startOverlay.style.display = "none";}
+        onComplete: ()=>{
+            startOverlay.style.display = "none";
+            guiEl.style.visibility = "visible";
+        }
     })
+    player.addKeyboard();
     animator();
     canvas.style.display = "block";
-});
+}
+
+btnEl.addEventListener("click", startGame);
+
+//check gamestate
+function gameState() {
+    if(player.health <= 0) {
+        cancelAnimationFrame(animationFrameID);
+        player.reset();
+        enemy.reset();
+        //game over animation
+        //show start button
+    }
+}

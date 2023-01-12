@@ -4,23 +4,29 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { gsap } from 'gsap'
 
 export default class Player {
-    health: number = 200;
-    input: string = '';
-    removedEnemies: number = 0;
-
-    enemyList: THREE.Mesh[] = [];
-    scene: THREE.Scene;
     model: THREE.Mesh;
-    dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
-    text: HTMLSpanElement
-    cssRenderer: CSS2DRenderer;
     laser: THREE.Mesh;
-    textAnimating: boolean = false;
+
+    private input: string = '';
+    private enemyList: THREE.Mesh[] = [];
+    private scene: THREE.Scene;
+    private dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
+    private text: HTMLSpanElement
+    private cssRenderer: CSS2DRenderer;
+    health: number = 100;
+    private healthGui = document.querySelector(".gui .health .bar") as HTMLDivElement;
+    private healthFraction = this.healthGui.offsetWidth / this.health as number;
+
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
         this.enemyList = enemyList;
+    }
+
+    addKeyboard() {
+        //Key inputs
+        document.addEventListener('keydown', (e) => this.updatePhysics(e));
     }
 
     async initialize() {
@@ -45,9 +51,6 @@ export default class Player {
 
         //add group to scene
         this.scene.add(this.model);
-
-        //Key inputs
-        document.addEventListener('keydown', (e) => this.updatePhysics(e));
 
         //create laser
         this.laser = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 1),
@@ -98,8 +101,6 @@ export default class Player {
 
                     this.enemyList.splice(index, 1);
                     splicedEnemy = true;
-                    //score
-                    this.removedEnemies++;
                     break
                 }
             }
@@ -107,16 +108,18 @@ export default class Player {
             //if user input wrong
             if (!splicedEnemy) {
                 //text animation
-                const tl = gsap.timeline({repeat: 2})
-                tl.to(textEl, {translateX: 5, duration: 0.03})
-                tl.to(textEl, {translateX: -5, duration: 0.03})
-                tl.to(textEl, {translateX: 5, duration: 0.03})
-                tl.to(textEl, {translateX: -5, duration: 0.03, onComplete: ()=>{
-                    // reset input when animation complete
-                    this.input = ''; 
-                    textEl.innerHTML = this.input;
-                    textEl.style.visibility = 'hidden';
-                }})
+                const tl = gsap.timeline({
+                    repeat: 2, onComplete: () => {
+                        // reset input when animation complete
+                        this.input = '';
+                        textEl.innerHTML = this.input;
+                        textEl.style.visibility = 'hidden';
+                    }
+                })
+                tl.to(textEl, { translateX: 5, duration: 0.03 })
+                tl.to(textEl, { translateX: -5, duration: 0.03 })
+                tl.to(textEl, { translateX: 5, duration: 0.03 })
+                tl.to(textEl, { translateX: -5, duration: 0.03 })
             } else {
                 this.input = ''; // reset input
                 textEl.innerHTML = this.input;
@@ -144,7 +147,9 @@ export default class Player {
                 this.destroyEnemy(enemy)
                 this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
+                //update player health
                 this.health--;
+                this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`;
             }
         });
     };
@@ -187,6 +192,11 @@ export default class Player {
 
         return mesh;
     };
+
+    reset() {
+        this.health = 100;
+        this.input = "";
+    }
 
     // public resize() {
     //     this.radius = innerWidth / 500;
