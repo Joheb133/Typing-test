@@ -10,7 +10,7 @@
     <script type="module" src="src/index.ts" defer></script>
 </head>
 
-<body>
+<body oncontextmenu="return false">
     <div class="gui" style="visibility: hidden;">
         <div class="health" style="width: 400px;">
             <div class="bar"></div>
@@ -29,6 +29,10 @@
     <div class="start-screen" style="display: none;">
         <p>Destroy asteroids, by typing their keyword before they <strong>HIT</strong> you!</p>
         <button id="start-game">START</button>
+    </div>
+    <div class="game-over-screen" style="display: none;">
+        <span><strong>GAME OVER</strong></span>
+        <button id="start-game">RESTART</button>
     </div>
 </body>
 

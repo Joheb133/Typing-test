@@ -8,12 +8,12 @@ export default class Player {
     laser: THREE.Mesh;
 
     private input: string = '';
-    private enemyList: THREE.Mesh[] = [];
+    enemyList: THREE.Mesh[] = [];
     private scene: THREE.Scene;
     private dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
     private text: HTMLSpanElement
     private cssRenderer: CSS2DRenderer;
-    health: number = 100;
+    health: number = 20;
     private healthGui = document.querySelector(".gui .health .bar") as HTMLDivElement;
     private healthFraction = this.healthGui.offsetWidth / this.health as number;
 
@@ -148,7 +148,7 @@ export default class Player {
                 this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
                 //update player health
-                this.health--;
+                this.health -= 5;
                 this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`;
             }
         });
@@ -163,7 +163,7 @@ export default class Player {
                 const mesh = child as THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>
                 mesh.geometry.dispose();
                 mesh.material.dispose();
-            } else if (child.type == 'Object3D' && this.cssRenderer.domElement.children.length > 1) {
+            } else if ((child as CSS2DObject).name == 'text' && this.cssRenderer.domElement.contains((child as CSS2DObject).element)) {
                 const textObj = enemy.getObjectByName('text') as CSS2DObject;
                 this.cssRenderer.domElement.removeChild(textObj.element)
             }
@@ -194,15 +194,14 @@ export default class Player {
     };
 
     reset() {
-        this.health = 100;
-        this.input = "";
-    }
+        this.health = 20;
+        this.healthFraction = this.healthGui.offsetWidth / this.health as number;
+        this.healthGui.style.width = "100%";
 
-    // public resize() {
-    //     this.radius = innerWidth / 500;
-    //     const scaleFactor = this.radius / this.model.geometry.parameters.radius;
-    //     this.model.scale.set(scaleFactor, scaleFactor, scaleFactor)
-    // }
+        this.input = ''; // reset input
+        this.text.innerHTML = this.input;
+        this.text.style.visibility = 'hidden';
+    }
 
     public update() {
         this.collisionDetection();

@@ -178,6 +178,17 @@ window.addEventListener('resize', () => {
     //enemy.resize();
 })
 
+//test
+// window.addEventListener("mousedown", (e)=>{
+//     if(e.button == 0) {
+//         console.log('left')
+//         enemy.reset();
+//     } else if(e.button == 2) {
+//         console.log('right')
+//         enemy.spawn();
+//     }
+// })
+
 //animator
 let animationFrameID: number;
 function animator() {
@@ -185,6 +196,7 @@ function animator() {
     enemy.update();
     player.update();
     movePlane();
+    gameState();
     composer.render();
     cssRenderer.render(scene, camera);
 }
@@ -210,12 +222,21 @@ function startGame() {
 btnEl.addEventListener("click", startGame);
 
 //check gamestate
+const gameOverEl = document.querySelector(".game-over-screen") as HTMLDivElement;
+const restartBtnEl = document.querySelector(".game-over-screen button") as HTMLButtonElement
 function gameState() {
-    if(player.health <= 0) {
+    if(player.health <= 0) {//stop game
         cancelAnimationFrame(animationFrameID);
-        player.reset();
-        enemy.reset();
-        //game over animation
-        //show start button
+        guiEl.style.visibility = "hidden";
+        gameOverEl.style.display = "block";
+        restartBtnEl.addEventListener("click", ()=>{
+            enemy.reset();
+            player.reset();
+            player.enemyList = enemy.list;
+
+            guiEl.style.visibility = "visible";
+            gameOverEl.style.display = "none";
+            animator();
+        })
     }
 }

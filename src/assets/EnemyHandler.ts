@@ -15,7 +15,7 @@ export default class EnemyHandler {
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
-        this.speed = 1 / 50;
+        this.speed = 1 / 30;
         this.model = this.createModel()
     }
 
@@ -69,7 +69,9 @@ export default class EnemyHandler {
     }
 
     reset() {
-        this.list.forEach(enemy => {
+        let x = 0;
+        this.list.forEach((enemy, i) => {
+            x++
             //remove from scene
             this.scene.remove(enemy);
             //dispose all children of enemy
@@ -78,12 +80,13 @@ export default class EnemyHandler {
                     const mesh = child as THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>
                     mesh.geometry.dispose();
                     mesh.material.dispose();
-                } else if (child.type == 'Object3D' && this.cssRenderer.domElement.children.length > 1) {
-                    const textObj = enemy.getObjectByName('text') as CSS2DObject;
-                    this.cssRenderer.domElement.removeChild(textObj.element)
+                } else if ((child as CSS2DObject).name == 'text' && this.cssRenderer.domElement.contains((child as CSS2DObject).element)) {
+                    const text = child as CSS2DObject
+                    this.cssRenderer.domElement.removeChild(text.element)
                 }
             });
         });
+        this.list = [];
         this.initialize();
     }
 
