@@ -173,9 +173,6 @@ window.addEventListener('resize', () => {
     //resize camera
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-
-    //player.resize();
-    //enemy.resize();
 })
 
 //test
@@ -201,9 +198,12 @@ function animator() {
     cssRenderer.render(scene, camera);
 }
 
-//play button
+//play game
 const btnEl = document.querySelector("#start-game") as HTMLButtonElement;
 const guiEl = document.querySelector(".gui") as HTMLDivElement;
+const waveEl = document.querySelector(".gui .score span") as HTMLSpanElement;
+let playing = true as boolean;
+let wave = 1 as number;
 
 function startGame() {
     gsap.to(startOverlay, {
@@ -225,7 +225,9 @@ btnEl.addEventListener("click", startGame);
 const gameOverEl = document.querySelector(".game-over-screen") as HTMLDivElement;
 const restartBtnEl = document.querySelector(".game-over-screen button") as HTMLButtonElement
 function gameState() {
+    //if player dead
     if(player.health <= 0) {//stop game
+        playing = false;
         cancelAnimationFrame(animationFrameID);
         guiEl.style.visibility = "hidden";
         gameOverEl.style.display = "block";
@@ -237,6 +239,28 @@ function gameState() {
             guiEl.style.visibility = "visible";
             gameOverEl.style.display = "none";
             animator();
+            playing = true;
+            wave = 1;
+            waveEl.innerText = `Wave: ${wave}`
         })
+    }
+
+    //wave handler
+    if(enemy.list.length <= 0 && playing) {//no enemies
+        //give player health if damaged
+        if(player.health+5 <= 20) player.health += 5;
+
+        //increase new enemy speed
+        enemy.speed += 0.0005;
+        enemy.createEnemy(5+(wave * 2))
+        if(wave > 5) {
+            enemy.speed += 0.0005;
+            setTimeout(() => {
+                enemy.createEnemy(wave * 2)
+            }, 5000);
+        }
+
+        wave++;
+        waveEl.innerText = `Wave: ${wave}`
     }
 }

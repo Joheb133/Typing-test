@@ -8,19 +8,19 @@ export default class EnemyHandler {
     // previousWidth: number = window.innerWidth / 2;
     // previousHeight: number = window.innerHeight / 2;
     private scene: THREE.Scene;
-    private speed: number;
+    speed: number;
     private model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
     private cssRenderer: CSS2DRenderer
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer) {
         this.scene = scene;
         this.cssRenderer = cssRenderer;
-        this.speed = 1 / 30;
+        this.speed = 1 / 40;
         this.model = this.createModel()
     }
 
     async initialize() {
-        this.createEnemy(10);
+        this.createEnemy(5);
     }
 
     createEnemy(length: number) {

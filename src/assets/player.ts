@@ -148,8 +148,9 @@ export default class Player {
                 this.enemyList.splice(index, 1)  //remove enemy from enemy handlers list
 
                 //update player health
-                this.health -= 5;
-                this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`;
+                this.health -= 1;
+                this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`
+                console.log(this.health);
             }
         });
     };
