@@ -21,10 +21,12 @@
   "homepage": "https://github.com/Joheb133/Typing-test#readme",
   "dependencies": {
     "gsap": "^3.11.4",
+    "howler": "^2.2.3",
     "postprocessing": "^6.29.2",
     "three": "^0.147.0"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.7",
     "@types/node": "^18.11.9",
     "@types/three": "^0.146.0",
     "tslib": "^2.4.1",

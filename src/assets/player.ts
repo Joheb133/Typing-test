@@ -2,21 +2,32 @@ import * as THREE from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { gsap } from 'gsap'
+import { Howl, Howler } from 'howler';
 
 export default class Player {
     model: THREE.Mesh;
     laser: THREE.Mesh;
+    enemyList: THREE.Mesh[] = [];
+    health: number = 20;
 
     private input: string = '';
-    enemyList: THREE.Mesh[] = [];
     private scene: THREE.Scene;
     private dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
+
     private text: HTMLSpanElement
     private cssRenderer: CSS2DRenderer;
-    health: number = 20;
+
     private healthGui = document.querySelector(".gui .health .bar") as HTMLDivElement;
     private healthFraction = this.healthGui.offsetWidth / this.health as number;
 
+    private sfx = {
+        pew: new Howl({
+            src: [
+                "/sound-effects/mixkit-short-laser-gun-shot.webm",
+                "/sound-effects/mixkit-short-laser-gun-shot.mp3"
+            ]
+        }) as Howl
+    }
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
@@ -86,7 +97,8 @@ export default class Player {
                 if (this.input === textObj.element.innerText) {
                     //laser animation
                     const angle = Math.atan2(enemy.position.x, enemy.position.z);
-                    this.laser.rotation.set(0, angle, 0)
+                    this.laser.rotation.set(0, angle, 0);
+                    this.sfx.pew.play();
                     gsap.to(this.laser.position, {
                         x: -enemy.position.x,
                         z: -enemy.position.z,
@@ -173,12 +185,12 @@ export default class Player {
 
     private async loadPlayerModel() {
         const textureLoader = new THREE.TextureLoader();
-        const lightMap = textureLoader.load('/assets/warship/lightMap.png') as any;
-        const map = textureLoader.load('/assets/warship/Warship.png')
+        const lightMap = textureLoader.load('/3d-assets/warship/lightMap.png') as any;
+        const map = textureLoader.load('/3d-assets/warship/Warship.png')
 
         const objLoader = new OBJLoader();
 
-        const obj = await objLoader.loadAsync('/assets/warship/Warship.obj');
+        const obj = await objLoader.loadAsync('/3d-assets/warship/Warship.obj');
         const objMesh = obj.children[0] as THREE.Mesh
         const material = new THREE.MeshStandardMaterial({
             color: 0x818181,
