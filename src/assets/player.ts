@@ -30,6 +30,7 @@ export default class Player {
         }) as Howl,
         wrong: new Howl({
             src: [
+                //“Sound effect obtained from https://www.zapsplat.com“
                 "/sound-effects/zapsplat_game_error_tone_7.webm",
                 "/sound-effects/zapsplat_game_error_tone_7.mp3"
             ]

@@ -22,13 +22,13 @@ export default class EnemyHandler {
     }
 
     createEnemy(length: number) {
-        const buffer = 20; //20 is default
+        const buffer = 30; //20 is default
         for (let i = 0; i < length; i++) {
             const word = dictionary[getRndFloat(0, dictionary.length - 1, 0)];
             const mesh = this.model.clone();
 
             //position
-            mesh.position.x = getRndFloat(-100, 100, 1); //defaullt -100, 100
+            mesh.position.x = getRndFloat(-100, 100, 1); //default -100, 100
             mesh.position.y = 5;
             mesh.position.z = getRndFloat(-100, 100, 1);
 

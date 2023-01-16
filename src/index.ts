@@ -10,6 +10,20 @@ import { gsap } from 'gsap'
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const startOverlay = document.querySelector('.start-screen') as HTMLDivElement;
 
+//check user screen size
+function screenSizeCheck() {
+    const screenEl = document.querySelector(".screen-size") as HTMLDivElement
+    if(innerWidth < 800 || innerHeight < 500) {
+        screenEl.style.display = "block";
+        canvas.style.display = "none";
+    } else {
+        screenEl.style.display = "none";
+        canvas.style.display = "block";
+    }
+}
+
+screenSizeCheck();
+
 //loading screen
 const loadingEl = document.querySelector('.loading-screen') as HTMLDivElement;
 const progressEl = document.querySelector('.progress') as HTMLDivElement; //loading bar
@@ -181,18 +195,10 @@ window.addEventListener('resize', () => {
     //resize camera
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-})
 
-//test
-// window.addEventListener("mousedown", (e)=>{
-//     if(e.button == 0) {
-//         console.log('left')
-//         enemy.reset();
-//     } else if(e.button == 2) {
-//         console.log('right')
-//         enemy.spawn();
-//     }
-// })
+    //check screen size
+    screenSizeCheck();
+})
 
 //animator
 let animationFrameID: number;
@@ -273,3 +279,4 @@ function gameState() {
         waveEl.innerText = `Wave: ${wave}`
     }
 }
+
