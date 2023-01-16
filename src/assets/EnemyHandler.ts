@@ -5,12 +5,10 @@ import getRndFloat from "../utils/rng";
 
 export default class EnemyHandler {
     list: THREE.Mesh[] = [];
-    // previousWidth: number = window.innerWidth / 2;
-    // previousHeight: number = window.innerHeight / 2;
-    private scene: THREE.Scene;
+    scene: THREE.Scene;
     speed: number;
-    private model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
-    private cssRenderer: CSS2DRenderer
+    private model: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
+    private cssRenderer: CSS2DRenderer;
 
     constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer) {
         this.scene = scene;
@@ -98,16 +96,16 @@ export default class EnemyHandler {
 
     private createModel() {
         const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x822828 })
+            new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0x822828, roughness: 0.5, metalness: 0.5})
         )
         const subMesh1 = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 1.5, 0.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(0.5, 1.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x815C28, roughness: 0.5, metalness: 0.5 })
         )
         const subMesh2 = new THREE.Mesh(
-            new THREE.BoxGeometry(1.5, 0.5, 0.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(1.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x815C28, roughness: 0.5, metalness: 0.5 })
         )
         const subMesh3 = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 0.5, 1.5), new THREE.MeshBasicMaterial({ color: 0x815C28 })
+            new THREE.BoxGeometry(0.5, 0.5, 1.5), new THREE.MeshStandardMaterial({ color: 0x815C28, roughness: 0.5, metalness: 0.5 })
         )
 
         mesh.add(subMesh1, subMesh2, subMesh3)

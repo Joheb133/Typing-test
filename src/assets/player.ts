@@ -12,6 +12,7 @@ export default class Player {
 
     private input: string = '';
     private scene: THREE.Scene;
+    private scene2: THREE.Scene;
     private dimensions: THREE.Vector3 = new THREE.Vector3(3.4, 0, 7.5);
 
     private text: HTMLSpanElement
@@ -26,11 +27,18 @@ export default class Player {
                 "/sound-effects/mixkit-short-laser-gun-shot.webm",
                 "/sound-effects/mixkit-short-laser-gun-shot.mp3"
             ]
-        }) as Howl
+        }) as Howl,
+        wrong: new Howl({
+            src: [
+                "/sound-effects/zapsplat_game_error_tone_7.webm",
+                "/sound-effects/zapsplat_game_error_tone_7.mp3"
+            ]
+        })
     }
 
-    constructor(scene: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
+    constructor(scene: THREE.Scene, scene2: THREE.Scene, cssRenderer: CSS2DRenderer, enemyList: THREE.Mesh[]) {
         this.scene = scene;
+        this.scene2 = scene2;
         this.cssRenderer = cssRenderer;
         this.enemyList = enemyList;
     }
@@ -119,6 +127,8 @@ export default class Player {
 
             //if user input wrong
             if (!splicedEnemy) {
+                //sound effect
+                this.sfx.wrong.play();
                 //text animation
                 const tl = gsap.timeline({
                     repeat: 2, onComplete: () => {
@@ -161,7 +171,7 @@ export default class Player {
 
                 //update player health
                 this.health -= 1;
-                this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`
+                this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`;
                 console.log(this.health);
             }
         });
@@ -169,7 +179,7 @@ export default class Player {
 
     private destroyEnemy(enemy: THREE.Mesh) {
         //remove from scene
-        this.scene.remove(enemy);
+        this.scene2.remove(enemy);
         //dispose all children of enemy
         enemy.children.forEach(child => {
             if (child.type == 'Mesh') {
@@ -196,9 +206,9 @@ export default class Player {
             color: 0x818181,
             map: map, //object skin
             emissive: 0xffffff, emissiveMap: lightMap, emissiveIntensity: 1, //parts that glow
-        })
+        });
 
-        const mesh = new THREE.Mesh(objMesh.geometry, material)
+        const mesh = new THREE.Mesh(objMesh.geometry, material);
 
         const boundingBox = new THREE.Box3().setFromObject(mesh);
         this.dimensions = boundingBox.getSize(new THREE.Vector3()) as THREE.Vector3;

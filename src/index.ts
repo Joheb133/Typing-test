@@ -38,8 +38,11 @@ function updateProgress(amount: number) {
     })
 }
 
-// create scene //
+// create main scene //
 const scene = new THREE.Scene();
+
+// enemy scene
+const scene2 = new THREE.Scene();
 
 //renderer
 const renderer = new THREE.WebGLRenderer({
@@ -63,10 +66,15 @@ const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 50
 camera.position.set(-40, 40, 40) //default was -40, 40, 40 //testing is 0, 40, 40
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-//scene lighting
+//main scene lighting
 const spotLight = new THREE.SpotLight(0xffffff, 1, 30, Math.PI / 3, 0, 1.25);
 spotLight.position.set(5, 15, 0);
 scene.add(spotLight);
+
+//enemy scene lighting
+const dLight = new THREE.DirectionalLight(0xffffff, 1);
+dLight.position.set(5, 50, 20);
+scene2.add(dLight);
 
 //ship lighting
 RectAreaLightUniformsLib.init();
@@ -142,8 +150,8 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
 //create player + enemy
-const enemy = new EnemyHandler(scene, cssRenderer)
-const player = new Player(scene, cssRenderer, enemy.list);
+const enemy = new EnemyHandler(scene2, cssRenderer)
+const player = new Player(scene, scene2, cssRenderer, enemy.list);
 
 async function loadPlayerEnemy() {
     await enemy.initialize();
@@ -195,7 +203,8 @@ function animator() {
     movePlane();
     gameState();
     composer.render();
-    cssRenderer.render(scene, camera);
+    cssRenderer.render(scene2, camera)
+    renderer.render(scene2, camera)
 }
 
 //play game
