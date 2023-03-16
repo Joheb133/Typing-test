@@ -173,7 +173,6 @@ export default class Player {
                 //update player health
                 this.health -= 1;
                 this.healthGui.style.width = `${this.healthGui.offsetWidth - this.healthFraction}px`;
-                console.log(this.health);
             }
         });
     };

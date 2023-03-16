@@ -3,7 +3,7 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib';
 import Player from './assets/player';
 import EnemyHandler from './assets/EnemyHandler';
-import { SelectiveBloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect } from "postprocessing";
+import { SelectiveBloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect, SMAAPreset } from "postprocessing";
 import { gsap } from 'gsap'
 
 // setup //
@@ -180,7 +180,7 @@ async function loadPlayerEnemy() {
     bloomEffect.selection.add(player.laser)
     composer.addPass(new EffectPass(camera, bloomEffect));
     composer.addPass(new EffectPass(camera, new SMAAEffect({
-        preset: 3
+        preset: SMAAPreset.ULTRA
     })))
     updateProgress(50)
 }
@@ -233,6 +233,7 @@ function startGame() {
     animator();
     canvas.style.display = "block";
 }
+
 
 btnEl.addEventListener("click", startGame);
 
